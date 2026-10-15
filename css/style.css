@@ -375,3 +375,48 @@ p { margin: 0 0 14px; }
 .danger summary:hover { color: var(--no); }
 .danger p { margin-top: 12px; color: var(--muted); }
 .btn.danger-btn { background: var(--no); border-color: var(--no); color: #fff; }
+
+/* ---------- "Rivedi la regola" ---------- */
+.kind .helpbtn {
+  margin-left: auto; display: inline-flex; align-items: center; gap: 7px; cursor: pointer;
+  font-size: 15px; padding: 5px 13px 5px 11px; border-radius: 999px; border: 1.5px solid var(--rail);
+  background: var(--paper); color: var(--ink);
+}
+.kind .helpbtn svg { width: 16px; height: 16px; }
+.kind .helpbtn:hover { border-color: var(--ink); }
+body.noscroll { overflow: hidden; }
+#drawer { position: fixed; inset: 0; z-index: 20; background: rgb(10 16 36 / 0); pointer-events: none; transition: background .2s; }
+#drawer.open { background: rgb(10 16 36 / .45); pointer-events: auto; }
+.dpanel {
+  position: absolute; top: 0; right: 0; bottom: 0; width: min(560px, 100%); overflow-y: auto; overscroll-behavior: contain;
+  background: var(--paper); padding: 0 24px 40px; transform: translateX(100%); transition: transform .22s ease-out;
+  box-shadow: -12px 0 40px rgb(0 0 0 / .18);
+}
+#drawer.open .dpanel { transform: none; }
+.dpanel header { position: sticky; top: 0; z-index: 1; background: var(--paper); display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 18px 0 12px; border-bottom: 4px solid var(--line); margin-bottom: 8px; }
+.dpanel header small { color: var(--muted); font-size: 14px; }
+.dpanel header h2 { margin: 0; font-size: 24px; }
+.dpanel header h2 i { font-style: normal; color: var(--line); }
+.dclose { flex: none; width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--panel); color: var(--ink); font-size: 26px; line-height: 1; cursor: pointer; }
+.dclose:hover { background: var(--ink); color: var(--paper); }
+.dpanel details { border-bottom: 1px solid var(--rail); scroll-margin-top: 90px; }
+.dpanel summary { cursor: pointer; padding: 14px 0; font-weight: 600; font-size: 19px; list-style: none; display: flex; align-items: center; gap: 10px; }
+.dpanel summary::-webkit-details-marker { display: none; }
+.dpanel summary::before { content: ""; flex: none; width: 12px; height: 12px; border-radius: 50%; border: 3px solid var(--line); background: var(--paper); }
+.dpanel details[open] summary::before { background: var(--line); }
+.dpanel .dsec { padding: 0 0 16px; }
+.dpanel .dsec p { font-size: 17px; }
+.dpanel .tbl { font-size: 16px; min-width: 0; }
+.dpanel .ex .en { font-size: 18px; }
+.dverb { margin: 14px 0 6px; padding: 14px 16px; border-radius: 10px; background: var(--panel); }
+.dverb > div:first-child b { font-size: 21px; }
+.dverb span { color: var(--muted); }
+.dverb .para { margin: 10px 0; }
+.dverb .para div { background: var(--paper); }
+.dverb a { font-size: 15px; }
+@media (max-width: 640px) {
+  .dpanel { top: auto; left: 0; width: 100%; max-height: 88vh; border-radius: 16px 16px 0 0; padding: 0 16px 32px; transform: translateY(100%); }
+  .kind .helpbtn { margin-left: 0; }
+  .dpanel details { scroll-margin-top: 150px; }
+}
+@media (prefers-reduced-motion: reduce) { .dpanel, #drawer { transition: none; } }

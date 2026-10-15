@@ -328,6 +328,7 @@ function route() {
   if (player) { player.pause(); player = null; }
   if (canSpeak) speechSynthesis.cancel();
   document.onkeydown = null;
+  closeHelp();
   const parts = location.hash.replace(/^#\/?/, '').split('/');
   const [head, ...rest] = parts;
   (routes[head] || home)(...rest);
@@ -475,6 +476,74 @@ function lesson(u) {
 const KIND = { c: 'Scegli la forma corretta', f: 'Completa la frase', t: 'Traduci in inglese', o: 'Metti le parole in ordine', x: "C'è un errore: riscrivi la frase corretta", irr: 'Scrivi il past simple e il participio passato', d: 'Dettato: ascolta e scrivi la frase' };
 const trackHTML = (n, marks, cur = -1) => `<div class="track" aria-hidden="true">${Array.from({ length: n }, (_, k) => `<i class="${k in marks ? (marks[k] ? 'ok' : 'no') : k === cur ? 'cur' : ''}"></i>`).join('')}</div>`;
 
+/* ---------- "Rivedi la regola": la teoria a portata di mano durante gli esercizi ---------- */
+const STOP = new Set('the a an i you he she it we they me him us them to of in on at is are am be was were and or but not no do does did my your his her its our their this that these those for with from by as so if what who how'.split(' '));
+const wordsOf = t => [...new Set(String(t).toLowerCase().match(/[a-z][a-z']*/g) || [])].filter(w => w.length > 1 && !STOP.has(w));
+// Sceglie la sezione di teoria più vicina all'esercizio: conta le parole inglesi in comune,
+// pesando di più quelle che compaiono in poche sezioni
+function sectionFor(u, ex) {
+  const secs = u.theory.map(s => plain(s.b).toLowerCase().replace(/\s+/g, ' '));
+  if (ex.t === 'd') { const k = secs.findIndex(s => s.includes(ex.a[0].toLowerCase())); if (k >= 0) return k; }
+  const words = wordsOf([ex.q, ex.h, ...(Array.isArray(ex.a) ? ex.a : [ex.a]), ...(ex.o || [])].join(' '));
+  const has = (s, w) => new RegExp(`(^|[^a-z'])${w.replace(/'/g, "\\'")}($|[^a-z'])`).test(s);
+  const df = Object.fromEntries(words.map(w => [w, secs.filter(s => has(s, w)).length]));
+  let bestK = 0, bestScore = 0;
+  // le parole dell'indizio ("have to, negativa") che compaiono nel titolo della sezione contano di più
+  // (e per la scelta multipla le opzioni: "for / since" porta alla sezione "For o since?")
+  const keyWords = [...new Set([ex.h, ...(ex.o || [])].join(' ').toLowerCase().match(/[a-z][a-z']+/g) || [])];
+  secs.forEach((s, k) => {
+    let score = words.reduce((acc, w) => acc + (df[w] && has(s, w) ? 1 / df[w] : 0), 0);
+    const head = plain(u.theory[k].h).toLowerCase();
+    score += keyWords.filter(w => has(head, w)).length * 1.5;
+    if (u.theory[k].h === 'Errori tipici') score *= ex.t === 'x' ? 1.3 : 0.4;
+    if (score > bestScore) { bestScore = score; bestK = k; }
+  });
+  return bestK;
+}
+// Il verbo di cui parla l'indizio ("study", "not / like", "be, negativa", "already / send")
+function verbOf(ex) {
+  if (ex.t === 'irr') return ex.v;
+  if (!ex.h) return null;
+  const parts = ex.h.split(',')[0].split('/').map(s => s.trim().toLowerCase()).reverse();
+  for (const p of parts) for (const cand of [p, p.split(' ')[0]]) {
+    const r = VERBS.find(cand);
+    if (r && r.v && !r.guessed) return r.v;
+  }
+  return null;
+}
+function openHelp(it) {
+  const ex = it.ex, u = it.u, v = verbOf(ex);
+  let d = $('#drawer');
+  if (!d) {
+    d = document.createElement('div'); d.id = 'drawer';
+    document.body.appendChild(d);
+    d.addEventListener('click', e => { if (e.target === d || e.target.closest('.dclose')) closeHelp(); });
+  }
+  const best = u ? sectionFor(u, ex) : -1;
+  const verbBox = v ? `<div class="dverb"><div><b>to ${v.b}</b>${v.it ? ` <span>${esc(v.it)}</span>` : ''}</div>
+      <div class="para"><div><small>past simple</small><b>${v.p}</b></div><div><small>participio</small><b>${v.pp}</b></div><div><small>-ing</small><b>${v.ing}</b></div><div><small>he, she, it</small><b>${v.third}</b></div></div>
+      <a href="#/verbi/${v.b}" target="_blank" rel="noopener">Tutti i tempi di ${v.b}, in una nuova scheda</a></div>` : '';
+  const theory = u ? u.theory.map((s, k) => `<details${k === best ? ' open' : ''}><summary>${s.h === 'Errori tipici' ? 'Mind the gap: gli errori tipici' : s.h}</summary><div class="dsec">${s.b}</div></details>`).join('')
+    : `<p class="small">Il past simple e il participio dei verbi irregolari vanno imparati a memoria: la tabella completa è nella pagina <a href="#/irregolari" target="_blank" rel="noopener">Verbi irregolari</a>.</p>`;
+  d.innerHTML = `<aside class="dpanel lesson" role="dialog" aria-modal="true" aria-labelledby="dtitle" style="--line:${u ? LV_COLOR[u.level] : 'var(--verbs)'}">
+    <header><div><small>${u ? `Linea ${u.level}, fermata ${u.n}` : 'Officina dei verbi'}</small><h2 id="dtitle">${u ? u.title : 'Verbi irregolari'}</h2></div><button class="dclose" type="button" aria-label="Chiudi">×</button></header>
+    ${verbBox}${theory}
+  </aside>`;
+  d.className = 'open';
+  document.body.classList.add('noscroll');
+  // con un verbo il riquadro delle sue forme resta in cima; altrimenti si va dritti alla sezione giusta
+  const open = d.querySelector('details[open]');
+  if (open && !v) requestAnimationFrame(() => open.scrollIntoView({ block: 'start' }));
+  d.querySelector('.dclose').focus();
+}
+function closeHelp() {
+  const d = $('#drawer'); if (!d || !d.classList.contains('open')) return false;
+  d.className = ''; document.body.classList.remove('noscroll');
+  const back = $('#body input:not(:disabled)') || $('#help'); if (back) back.focus();
+  return true;
+}
+const helpOpen = () => !!$('#drawer.open');
+
 function session({ items, back, line, onAnswer, onEnd }) {
   let i = 0, right = 0;
   const wrong = [], marks = {};
@@ -486,7 +555,7 @@ function session({ items, back, line, onAnswer, onEnd }) {
     let checked = false;
     app.innerHTML = `<div class="sess" style="--line:${line}">
       <div class="sess-top"><a href="${back}">Esci</a>${trackHTML(total, marks, i)}<span class="count">${i + 1} di ${total}</span></div>
-      <div class="kind">${KIND[ex.t]}${ex.h ? `<span class="hint">${esc(ex.h)}</span>` : ''}</div>
+      <div class="kind"><span>${KIND[ex.t]}</span>${ex.h ? `<span class="hint">${esc(ex.h)}</span>` : ''}<button class="helpbtn" id="help" type="button" aria-haspopup="dialog"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 3.5C3.6 2.6 5.6 2.6 8 3.6c2.4-1 4.4-1 6 -.1v9.5c-1.6-.8-3.6-.8-6 .2-2.4-1-4.4-1-6-.2z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 3.6v9.5" stroke="currentColor" stroke-width="1.4"/></svg>Rivedi la regola</button></div>
       <div id="body">${body(ex)}</div>
       <div class="fb" id="fb" aria-live="polite"></div>
       <div class="actions"><button class="btn" id="go">Controlla</button>${ex.t !== 'c' ? '<button class="link" id="idk">Non lo so</button>' : ''}</div>
@@ -575,7 +644,10 @@ function session({ items, back, line, onAnswer, onEnd }) {
     }
     go.onclick = () => check();
     $('#idk') && ($('#idk').onclick = () => check(null, true));
+    $('#help').onclick = () => openHelp(it);
     document.onkeydown = e => {
+      // con il pannello della regola aperto: Esc lo chiude, il resto della tastiera resta al pannello
+      if (helpOpen()) { if (e.key === 'Escape') { e.preventDefault(); closeHelp(); } return; }
       // scelta multipla: tasti 1-4
       if (ex.t === 'c' && !checked && /^[1-9]$/.test(e.key)) { const b = $$('.opt')[e.key - 1]; if (b) b.click(); return; }
       if (e.key !== 'Enter') return;
