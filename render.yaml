@@ -1,0 +1,17 @@
+# Servizio Render dedicato alle API degli account di Brexli.
+# Il sito resta su GitHub Pages; questo servizio gestisce solo accessi e progressi.
+services:
+  - type: web
+    name: brexli-api
+    runtime: node
+    region: frankfurt
+    plan: free
+    buildCommand: npm ci --omit=dev
+    startCommand: node server/standalone.mjs
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: DATABASE_URL
+        sync: false

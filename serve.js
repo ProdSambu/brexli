@@ -1,7 +1,7 @@
 // Server statico minimo per provare il sito in locale: node serve.js
 const http = require('http'), fs = require('fs'), path = require('path');
 const root = __dirname;
-const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.json': 'application/json' };
+const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.json': 'application/json', '.mp3': 'audio/mpeg', '.otf': 'font/otf' };
 http.createServer((req, res) => {
   let p = decodeURIComponent(req.url.split('?')[0]);
   if (p.endsWith('/')) p += 'index.html';
@@ -12,4 +12,4 @@ http.createServer((req, res) => {
     res.writeHead(200, { 'Content-Type': types[path.extname(f)] || 'application/octet-stream', 'Cache-Control': 'no-cache' });
     res.end(d);
   });
-}).listen(process.env.PORT || 5173, () => console.log('Fondamenta su http://localhost:' + (process.env.PORT || 5173)));
+}).listen(process.env.PORT || 5173, () => console.log('Brexli su http://localhost:' + (process.env.PORT || 5173)));

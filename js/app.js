@@ -5,41 +5,238 @@ const app = $('#app');
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
-/* ---------- progressi (solo in questo browser) ---------- */
+/* ---------- progressi: salvati in questo browser e, con un account, sul server ---------- */
+// le chiavi conservano il vecchio nome del progetto, così chi aveva già dei progressi non li perde
 const KEY = 'fondamenta.v1';
 let data = {};
 try { data = JSON.parse(localStorage.getItem(KEY)) || {}; } catch { data = {}; }
-data.units ||= {}; data.review ||= []; data.irr ||= {};
-const save = () => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch {} updateCount(); };
+data = PROGRESS.cleanProgress(data);
+const saveLocal = () => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch {} updateCount(); };
+const save = () => { saveLocal(); schedulePush(); };
 function updateCount() {
   const n = data.review.filter(r => exerciseOf(r)).length;
   $('#revcount').textContent = n ? n : '';
 }
 
-/* ---------- audio (sintesi vocale del browser) ---------- */
+// Indirizzo dell'API degli account (un solo punto da cambiare se il server si sposta)
+const API = /^(localhost|127\.0\.0\.1)$/.test(location.hostname)
+  ? 'http://localhost:3100/api'
+  : 'https://brexli-api.onrender.com/api';
+const AUTH_KEY = 'fondamenta.auth';
+let auth = null;
+try { auth = JSON.parse(localStorage.getItem(AUTH_KEY)); } catch { auth = null; }
+let sync = { state: 'idle', at: 0, msg: '' };
+
+async function api(path, { method = 'GET', body } = {}) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 75000); // il server gratuito può metterci un minuto a svegliarsi
+  const slow = setTimeout(() => setSync('waking'), 4000);
+  try {
+    const res = await fetch(API + path, {
+      method, signal: ctrl.signal,
+      headers: { 'Content-Type': 'application/json', ...(auth?.token ? { Authorization: 'Bearer ' + auth.token } : {}) },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    const j = await res.json().catch(() => ({}));
+    if (!res.ok) { const e = new Error(j.error || `Errore ${res.status}`); e.status = res.status; throw e; }
+    return j;
+  } catch (e) {
+    if (!e.status) e.message = 'Server non raggiungibile. Controlla la connessione e riprova.';
+    throw e;
+  } finally { clearTimeout(timer); clearTimeout(slow); }
+}
+function setAuth(a) {
+  auth = a;
+  try { a ? localStorage.setItem(AUTH_KEY, JSON.stringify(a)) : localStorage.removeItem(AUTH_KEY); } catch {}
+  updateNav();
+}
+function setSync(state, msg = '') {
+  sync = { state, msg, at: state === 'ok' ? Date.now() : sync.at };
+  const el = $('#syncstate'); if (el) el.innerHTML = syncText();
+}
+function syncText() {
+  if (sync.state === 'syncing') return 'Sincronizzazione in corso…';
+  if (sync.state === 'waking') return 'Il server si sta svegliando: può volerci fino a un minuto.';
+  if (sync.state === 'ok') return `Progressi salvati online alle ${new Date(sync.at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}.`;
+  if (sync.state === 'error' || sync.state === 'offline') return `Non sincronizzato: ${esc(sync.msg)} I progressi restano salvati qui e verranno inviati alla prossima occasione.`;
+  return 'I progressi si salvano online a ogni esercizio.';
+}
+function applyRemote(remote) {
+  data = PROGRESS.mergeProgress(data, remote || {});
+  saveLocal();
+}
+let pushTimer = null, pushing = null;
+function schedulePush() {
+  if (!auth) return;
+  clearTimeout(pushTimer);
+  pushTimer = setTimeout(pushProgress, 1200);
+}
+async function pushProgress() {
+  if (!auth) return;
+  if (pushing) return pushing.then(pushProgress);
+  setSync('syncing');
+  pushing = api('/progress', { method: 'PUT', body: { data } })
+    .then(r => { applyRemote(r.data); setSync('ok'); })
+    .catch(e => {
+      if (e.status === 401) { setAuth(null); toast('Sessione scaduta: accedi di nuovo per salvare i progressi online.'); }
+      setSync(e.status ? 'error' : 'offline', e.message);
+    })
+    .finally(() => { pushing = null; });
+  return pushing;
+}
+// All'apertura (e quando torni sulla scheda) prende i progressi degli altri dispositivi
+async function pullProgress({ rerender = true } = {}) {
+  if (!auth) return;
+  setSync('syncing');
+  try {
+    const r = await api('/progress');
+    const before = JSON.stringify(data);
+    applyRemote(r.data);
+    setSync('ok');
+    // se qui c'era qualcosa che il server non aveva, lo manda
+    if (JSON.stringify(PROGRESS.mergeProgress(r.data || {}, data)) !== JSON.stringify(PROGRESS.cleanProgress(r.data))) schedulePush();
+    // ridisegna la pagina solo se è cambiato qualcosa e non c'è una sessione di esercizi aperta
+    if (rerender && before !== JSON.stringify(data) && !/pratica|allena|ripasso\/via/.test(location.hash)) route();
+  } catch (e) {
+    if (e.status === 401) { setAuth(null); toast('Sessione scaduta: accedi di nuovo per salvare i progressi online.'); }
+    setSync(e.status ? 'error' : 'offline', e.message);
+  }
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && auth && Date.now() - sync.at > 60000) pullProgress();
+});
+function updateNav() {
+  const a = $('#acct'); if (!a) return;
+  a.textContent = auth ? auth.username : 'Accedi';
+  a.title = auth ? 'Il tuo account' : 'Accedi o crea un account';
+}
+
+function accountPage() {
+  document.title = 'Account — Brexli';
+  if (!auth) return loginView();
+  const done = UNITS.filter(u => (data.units[u.id]?.best || 0) >= 80).length;
+  app.innerHTML = `<section class="narrow account">
+    <div class="page-head">
+      <h1>Ciao, ${esc(auth.username)}</h1>
+      <p class="lede">Hai superato ${done} fermate su ${UNITS.length}. I progressi sono legati al tuo account: accedi con lo stesso nome utente da un altro dispositivo e li ritrovi.</p>
+    </div>
+    <div class="note" id="syncstate" role="status">${syncText()}</div>
+    <div class="actions"><button class="btn" id="syncnow">Sincronizza ora</button><button class="btn ghost" id="logout">Esci</button></div>
+    <details class="danger">
+      <summary>Elimina l'account</summary>
+      <p>L'account e i progressi salvati online vengono cancellati per sempre. Per conferma scrivi la password.</p>
+      <form id="delform" class="authform">
+        <label>Password<input class="line" type="password" name="password" autocomplete="current-password" required></label>
+        <p class="formerr" role="alert"></p>
+        <button class="btn danger-btn">Elimina definitivamente</button>
+      </form>
+    </details>
+  </section>`;
+  $('#syncnow').onclick = () => pullProgress({ rerender: false });
+  $('#logout').onclick = async () => {
+    $('#logout').disabled = true;
+    await pushProgress();
+    await api('/logout', { method: 'POST' }).catch(() => {});
+    setAuth(null);
+    // su un computer condiviso i progressi non devono restare: sono comunque salvati nell'account
+    data = PROGRESS.cleanProgress({}); saveLocal();
+    toast('Sei uscito. I tuoi progressi restano salvati nell\'account.');
+    location.hash = '#/';
+  };
+  $('#delform').onsubmit = async e => {
+    e.preventDefault();
+    const f = e.target, err = f.querySelector('.formerr');
+    err.textContent = ''; f.querySelector('button').disabled = true;
+    try {
+      await api('/account', { method: 'DELETE', body: { password: f.password.value } });
+      setAuth(null); data = PROGRESS.cleanProgress({}); saveLocal();
+      toast('Account eliminato.');
+      location.hash = '#/';
+    } catch (ex) { err.textContent = ex.message; f.querySelector('button').disabled = false; }
+  };
+}
+
+function loginView(mode = 'login') {
+  // il servizio gratuito dorme quando nessuno lo usa: lo svegliamo mentre si compila il modulo
+  fetch(API + '/health').catch(() => {});
+  const reg = mode === 'register';
+  const local = Object.keys(data.units).length;
+  app.innerHTML = `<section class="narrow account">
+    <div class="page-head">
+      <h1>${reg ? 'Crea un account' : 'Accedi'}</h1>
+      <p class="lede">Con un account i progressi si salvano online e li ritrovi su ogni dispositivo. Bastano un nome utente e una password, niente email.</p>
+    </div>
+    <div class="tabs" role="tablist">
+      <button role="tab" aria-selected="${!reg}" id="tab-login">Accedi</button>
+      <button role="tab" aria-selected="${reg}" id="tab-reg">Crea un account</button>
+    </div>
+    <form class="authform" id="authform" novalidate>
+      <label>Nome utente<input class="line" name="username" autocomplete="username" autocapitalize="off" spellcheck="false" required minlength="3" maxlength="24"></label>
+      <label>Password<input class="line" type="password" name="password" autocomplete="${reg ? 'new-password' : 'current-password'}" required minlength="8"></label>
+      ${reg ? '<label>Ripeti la password<input class="line" type="password" name="password2" autocomplete="new-password" required minlength="8"></label>' : ''}
+      ${reg ? '<p class="small">Il nome utente può avere da 3 a 24 caratteri tra lettere, numeri, punto e trattini. La password almeno 8 caratteri. <b>Non c\'è modo di recuperare una password dimenticata</b>: scegline una che ricordi.</p>' : ''}
+      ${local ? `<p class="small">I progressi che hai già fatto in questo browser (${local} ${local === 1 ? 'fermata' : 'fermate'}) verranno aggiunti al tuo account.</p>` : ''}
+      <p class="formerr" role="alert"></p>
+      <div class="actions"><button class="btn">${reg ? 'Crea l\'account' : 'Accedi'}</button><span class="small" id="authwait"></span></div>
+    </form>
+  </section>`;
+  $('#tab-login').onclick = () => loginView('login');
+  $('#tab-reg').onclick = () => loginView('register');
+  const f = $('#authform');
+  f.username.focus();
+  f.onsubmit = async e => {
+    e.preventDefault();
+    const err = f.querySelector('.formerr'), btn = f.querySelector('.btn');
+    err.textContent = '';
+    const username = f.username.value.trim(), password = f.password.value;
+    if (reg && password !== f.password2.value) { err.textContent = 'Le due password non coincidono.'; return; }
+    btn.disabled = true;
+    const wait = setTimeout(() => { $('#authwait').textContent = 'Il server si sta svegliando: può volerci fino a un minuto.'; }, 4000);
+    try {
+      const r = await api(reg ? '/register' : '/login', { method: 'POST', body: { username, password } });
+      setAuth({ token: r.token, username: r.username });
+      await pullProgress({ rerender: false });
+      await pushProgress();
+      toast(reg ? `Account creato. Benvenuto, ${r.username}!` : `Bentornato, ${r.username}!`);
+      location.hash = '#/';
+    } catch (ex) { err.textContent = ex.message; btn.disabled = false; }
+    finally { clearTimeout(wait); $('#authwait') && ($('#authwait').textContent = ''); }
+  };
+}
+
+/* ---------- audio: MP3 registrati (voce Cori, Piper) con la voce del browser come ripiego ---------- */
 const canSpeak = 'speechSynthesis' in window;
-if (!canSpeak) document.body.classList.add('nosay');
+const AUDIO_KEYS = window.AUDIO_KEYS || new Set();
 let voice = null;
 function pickVoice() {
+  if (!canSpeak) return;
   const vs = speechSynthesis.getVoices();
   voice = vs.find(v => v.lang === 'en-GB' && /natural|online|google/i.test(v.name))
     || vs.find(v => v.lang === 'en-GB') || vs.find(v => /^en[-_]/i.test(v.lang)) || null;
 }
 if (canSpeak) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
-let warnedVoice = false;
-function say(text) {
-  if (!canSpeak) return;
-  speechSynthesis.cancel();
+let warnedVoice = false, player = null;
+const hasAudio = text => AUDIO_KEYS.has(SPEECH.speechKey(text));
+// Restituisce una promessa che si risolve quando la frase è finita (serve al dettato)
+function say(text, rate = 1) {
+  if (player) { player.pause(); player = null; }
+  if (canSpeak) speechSynthesis.cancel();
+  if (hasAudio(text)) {
+    player = new Audio(`audio/${SPEECH.speechKey(text)}.mp3`);
+    player.playbackRate = rate; player.preservesPitch = true;
+    return new Promise(res => { player.onended = player.onerror = res; player.play().catch(res); });
+  }
+  if (!canSpeak) return Promise.resolve();
   if (!voice) pickVoice();
   // Voci caricate ma nessuna inglese: meglio non leggere l'inglese con una voce italiana
   if (!voice && speechSynthesis.getVoices().length) {
     if (!warnedVoice) toast('Il browser non ha una voce inglese installata. Su Windows: Impostazioni → Ora e lingua → Voce → Aggiungi voci → English (United Kingdom). Oppure apri il sito con Edge o Chrome.');
     warnedVoice = true;
-    return;
+    return Promise.resolve();
   }
   const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'en-GB'; if (voice) u.voice = voice; u.rate = 0.92;
-  speechSynthesis.speak(u);
+  u.lang = 'en-GB'; if (voice) u.voice = voice; u.rate = 0.92 * rate;
+  return new Promise(res => { u.onend = u.onerror = res; speechSynthesis.speak(u); });
 }
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-say]');
@@ -76,7 +273,7 @@ function variants(s) {
   if (HAS.test(s)) out.push(s.replace(HAS, '$1 has ').replace(S, '$1 is'));
   return out;
 }
-const fillIn = (q, x) => q.replace('___', x.trim()).replace(/ '/g, "'").replace(/\s+([.,!?])/g, '$1');
+const fillIn = SPEECH.fillIn;
 // strict: nessuna equivalenza tra forme contratte e piene (serve quando l'errore è proprio la contrazione)
 function matches(user, answers, strict = false) {
   if (strict) { const u = norm(user); return answers.some(a => norm(a) === u); }
@@ -116,14 +313,16 @@ const routes = {
   irregolari: irregularPage,
   'allena-irregolari': irregularDrill,
   ripasso: reviewPage,
+  account: () => accountPage(),
 };
 function route() {
+  if (player) { player.pause(); player = null; }
   if (canSpeak) speechSynthesis.cancel();
   document.onkeydown = null;
   const parts = location.hash.replace(/^#\/?/, '').split('/');
   const [head, ...rest] = parts;
   (routes[head] || home)(...rest);
-  const navKey = { '': 'corso', u: 'corso', verbi: 'verbi', irregolari: 'irregolari', 'allena-irregolari': 'irregolari', ripasso: 'ripasso' }[head] || 'corso';
+  const navKey = { '': 'corso', u: 'corso', verbi: 'verbi', irregolari: 'irregolari', 'allena-irregolari': 'irregolari', ripasso: 'ripasso', account: 'account' }[head] || 'corso';
   $$('[data-nav]').forEach(a => a.classList.toggle('on', a.dataset.nav === navKey));
   window.scrollTo(0, 0);
 }
@@ -134,19 +333,36 @@ const plain = s => String(s).replace(/<[^>]+>/g, '');
 const best = u => data.units[u.id]?.best || 0;
 const isDone = u => best(u) >= 80;
 const LV_COLOR = { A1: 'var(--a1)', A2: 'var(--a2)', B1: 'var(--b1)' };
-const a1Units = () => UNITS.filter(u => u.level === 'A1');
-const nextUnit = () => a1Units().find(u => !isDone(u));
+const LINES = [
+  { lv: 'A1', name: 'Le basi', c: 'a1' },
+  { lv: 'A2', name: 'Raccontare e confrontare', c: 'a2' },
+  { lv: 'B1', name: 'Frasi complesse', c: 'b1' },
+];
+const lineUnits = lv => UNITS.filter(u => u.level === lv);
+// fermate ancora in costruzione: quelle del ROADMAP per le linee che non hanno ancora unità
+const soonUnits = lv => lineUnits(lv).length ? [] : (ROADMAP.find(l => l.lv === lv)?.units || []);
+const inService = lv => lineUnits(lv).length > 0;
+const nextUnit = () => UNITS.find(u => !isDone(u));
 
 function mapSVG() {
-  const a1 = a1Units(), next = nextUnit();
+  const next = nextUnit();
   const st = [];
-  a1.forEach((u, k) => st.push({ x: 70 + k * 92, y: 110, name: u.stop, title: `${u.n}. ${plain(u.title)}`, c: 'a1', href: `#/u/${u.id}`, done: isDone(u), now: u === next, up: k % 2 === 1, xch: k === 9 || k === 11 }));
-  ROADMAP[0].units.forEach((s, k) => st.push({ x: 990 - k * 92, y: 300, name: s.stop, title: `${s.title}: in costruzione`, c: 'a2', soon: true, up: k % 2 === 0, xch: k === 9, side: k === 9 }));
-  ROADMAP[1].units.forEach((s, k) => st.push({ x: 254 + k * 110, y: 490, name: s.stop, title: `${s.title}: in costruzione`, c: 'b1', soon: true, up: k % 2 === 1 }));
+  // A1 in alto verso destra, A2 al centro verso sinistra, B1 in basso verso destra
+  const geo = {
+    A1: k => ({ x: 70 + k * 92, y: 110, up: k % 2 === 1, xch: k === 9 || k === 11 }),
+    A2: k => ({ x: 990 - k * 92, y: 300, up: k % 2 === 0, xch: k === 9, side: k === 9 }),
+    B1: k => ({ x: 254 + k * 110, y: 490, up: k % 2 === 1 }),
+  };
+  for (const l of LINES) {
+    lineUnits(l.lv).forEach((u, k) => st.push({ ...geo[l.lv](k), name: u.stop, title: `${l.lv}, fermata ${u.n}: ${plain(u.title)}`, c: l.c, href: `#/u/${u.id}`, done: isDone(u), now: u === next }));
+    soonUnits(l.lv).forEach((s, k) => st.push({ ...geo[l.lv](k), name: s.stop, title: `${s.title}: in costruzione`, c: l.c, soon: true }));
+  }
   st.push({ x: 898, y: 205, name: 'Irregolari', title: 'Tabella e allenamento dei verbi irregolari', c: 'verbs', href: '#/irregolari', up: false });
   st.push({ x: 1000, y: 205, name: 'Coniugatore', title: 'Tutti i tempi di un verbo', c: 'verbs', href: '#/verbi', up: false });
 
-  const hollow = (d, c) => `<path d="${d}" fill="none" stroke="var(--${c})" stroke-width="11" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="var(--paper)" stroke-width="4.5" stroke-linejoin="round"/>`;
+  const track = (d, c, lv, cls = '') => inService(lv)
+    ? `<path${cls ? ` class="${cls}"` : ''} d="${d}" fill="none" stroke="var(--${c})" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>`
+    : `<path d="${d}" fill="none" stroke="var(--${c})" stroke-width="11" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="var(--paper)" stroke-width="4.5" stroke-linejoin="round"/>`;
   const badge = (x, y, t, c) => `<g class="badge"><rect x="${x}" y="${y}" width="38" height="24" rx="4" fill="var(--${c})"/><text x="${x + 19}" y="${y + 17}" text-anchor="middle">${t}</text></g>`;
   const station = s => {
     const ly = s.up ? s.y - 22 : s.y + 33;
@@ -161,11 +377,12 @@ function mapSVG() {
     if (s.soon) return `<g class="soonstn"><title>${esc(s.title)}</title>${mark}${label}</g>`;
     return `<a class="stn" href="${s.href}" aria-label="${esc(s.title)}"><title>${esc(s.title)}</title>${here}${mark}${label}</a>`;
   };
-  return `<svg class="map" viewBox="0 0 1150 548" role="img" aria-label="Mappa del corso: la linea A1 con 12 fermate, le linee A2 e B1 in costruzione">
-    ${hollow('M1082 110 V250 L1032 300 H162', 'a2')}
-    ${hollow('M162 300 V440 L212 490 H1024', 'b1')}
+  const desc = LINES.map(l => `linea ${l.lv} ${inService(l.lv) ? `con ${lineUnits(l.lv).length} fermate` : 'in costruzione'}`).join(', ');
+  return `<svg class="map" viewBox="0 0 1150 548" role="img" aria-label="Mappa del corso: ${desc}">
+    ${track('M162 300 V440 L212 490 H1024', 'b1', 'B1')}
+    ${track('M1082 110 V250 L1032 300 H162', 'a2', 'A2')}
     <path d="M898 110 V205 H1000" fill="none" stroke="var(--verbs)" stroke-width="9" stroke-linejoin="round"/>
-    <path class="draw" d="M70 110 H1082" fill="none" stroke="var(--a1)" stroke-width="9" stroke-linecap="round"/>
+    ${track('M70 110 H1082', 'a1', 'A1', 'draw')}
     ${badge(14, 98, 'A1', 'a1')}${badge(1098, 168, 'A2', 'a2')}${badge(110, 360, 'B1', 'b1')}
     ${st.map(station).join('')}
   </svg>`;
@@ -175,40 +392,41 @@ function vmap() {
   const next = nextUnit();
   const row = (inner, cls = '') => `<li class="${cls}">${inner}</li>`;
   const pin = '<span class="pin"><i></i></span>';
-  const a1 = a1Units().map(u => row(`<a href="#/u/${u.id}">${pin}<span class="txt"><b>${u.stop}</b><span>${u.sub}</span></span></a>`, isDone(u) ? 'done' : u === next ? 'now' : '')).join('');
-  const soon = l => l.units.map(s => row(`<div class="row">${pin}<span class="txt"><b>${s.stop}</b><span>${s.title}</span></span></div>`)).join('');
+  const line = l => inService(l.lv)
+    ? `<section class="vline" style="--c:${LV_COLOR[l.lv]}"><h2><span class="tag">${l.lv}</span>${l.name} <small>in servizio</small></h2><ol>${lineUnits(l.lv).map(u => row(`<a href="#/u/${u.id}">${pin}<span class="txt"><b>${u.stop}</b><span>${u.sub}</span></span></a>`, isDone(u) ? 'done' : u === next ? 'now' : '')).join('')}</ol></section>`
+    : `<section class="vline soon" style="--c:${LV_COLOR[l.lv]}"><h2><span class="tag">${l.lv}</span>${l.name} <small>in costruzione</small></h2><ol>${soonUnits(l.lv).map(s => row(`<div class="row">${pin}<span class="txt"><b>${s.stop}</b><span>${s.title}</span></span></div>`)).join('')}</ol></section>`;
   return `<div class="vmap">
-    <section class="vline" style="--c:var(--a1)"><h2><span class="tag">A1</span>Le basi <small>in servizio</small></h2><ol>${a1}</ol></section>
+    ${line(LINES[0])}
     <section class="vline" style="--c:var(--verbs)"><h2>Officina dei verbi</h2><ol>
       ${row(`<a href="#/irregolari">${pin}<span class="txt"><b>Irregolari</b><span>Tabella e allenamento</span></span></a>`)}
       ${row(`<a href="#/verbi">${pin}<span class="txt"><b>Coniugatore</b><span>Tutti i tempi di un verbo</span></span></a>`)}
     </ol></section>
-    ${ROADMAP.map(l => `<section class="vline soon" style="--c:${LV_COLOR[l.lv]}"><h2><span class="tag">${l.lv}</span>${l.name} <small>in costruzione</small></h2><ol>${soon(l)}</ol></section>`).join('')}
+    ${LINES.slice(1).map(line).join('')}
   </div>`;
 }
 
 /* ---------- home ---------- */
 function home() {
-  document.title = 'Fondamenta — grammatica inglese, una fermata alla volta';
-  const a1 = a1Units(), next = nextUnit();
-  const done = a1.filter(isDone).length;
+  document.title = 'Brexli — grammatica inglese, una fermata alla volta';
+  const next = nextUnit();
   const started = Object.keys(data.units).length > 0;
+  const live = LINES.filter(l => inService(l.lv)), building = LINES.filter(l => !inService(l.lv));
   app.innerHTML = `
   <section class="hero">
     <div>
       <h1>Una fermata<br>alla volta.</h1>
       <p class="lede">Grammatica inglese per chi parla italiano, dal verbo essere alle frasi complesse. Ogni fermata è una regola: la leggi, la metti alla prova, passi alla successiva.</p>
     </div>
-    ${next ? `<div class="next-train">
-      <div class="k">${started ? 'Prossima fermata' : 'Prima fermata'}</div>
+    ${next ? `<div class="next-train" style="--line:${LV_COLOR[next.level]}">
+      <div class="k">${started ? `Prossima fermata, linea ${next.level}` : 'Prima fermata'}</div>
       <div class="s"><i></i>${next.stop}</div>
       <a class="btn" href="#/u/${next.id}">${started ? 'Riprendi il viaggio' : 'Parti da qui'}</a>
-    </div>` : `<div class="next-train"><div class="k">Linea A1</div><div class="s"><i></i>Tutte le ${a1.length} fermate superate</div><a class="btn" href="#/ripasso">Vai al ripasso</a></div>`}
+    </div>` : `<div class="next-train"><div class="k">Tutte le linee in servizio</div><div class="s"><i></i>${UNITS.length} fermate superate</div><a class="btn" href="#/ripasso">Vai al ripasso</a></div>`}
   </section>
   <div class="map-wrap">${mapSVG()}</div>
   <div class="legend">
-    <span><i style="--c:var(--a1)"></i>Linea A1, in servizio: ${done} di ${a1.length} fermate superate</span>
-    <span><i class="hollow" style="--c:var(--a2)"></i>Linee A2 e B1, in costruzione</span>
+    ${live.map(l => `<span><i style="--c:${LV_COLOR[l.lv]}"></i>Linea ${l.lv}: ${lineUnits(l.lv).filter(isDone).length} di ${lineUnits(l.lv).length} fermate superate</span>`).join('')}
+    ${building.length ? `<span><i class="hollow" style="--c:${LV_COLOR[building[0].lv]}"></i>Linea ${building.map(l => l.lv).join(' e ')}, in costruzione</span>` : ''}
     <span><i style="--c:var(--verbs)"></i>Officina dei verbi</span>
     <span><i class="dot"></i>Interscambio</span>
   </div>
@@ -217,32 +435,35 @@ function home() {
 
 /* ---------- lezione ---------- */
 function strip(u) {
-  const a1 = a1Units(), k = a1.indexOf(u), prev = a1[k - 1], next = a1[k + 1];
-  return `<nav class="strip" aria-label="Fermate della linea A1">
-    <div class="strip-line">${a1.map(x => `<a href="#/u/${x.id}" title="${x.n}. ${esc(plain(x.title))}" class="${x === u ? 'cur' : isDone(x) ? 'done' : ''}"${x === u ? ' aria-current="page"' : ''}></a>`).join('')}</div>
-    <div class="strip-ends">${prev ? `<a href="#/u/${prev.id}">‹ ${prev.stop}</a>` : '<span>Capolinea</span>'}${next ? `<a href="#/u/${next.id}">${next.stop} ›</a>` : '<span>Capolinea</span>'}</div>
+  const line = lineUnits(u.level), all = UNITS.indexOf(u), prev = UNITS[all - 1], next = UNITS[all + 1];
+  const end = (x, dir) => !x ? '<span>Capolinea</span>'
+    : x.level !== u.level ? `<a href="#/u/${x.id}">${dir < 0 ? '‹ ' : ''}Cambio: linea ${x.level}${dir > 0 ? ' ›' : ''}</a>`
+    : `<a href="#/u/${x.id}">${dir < 0 ? '‹ ' : ''}${x.stop}${dir > 0 ? ' ›' : ''}</a>`;
+  return `<nav class="strip" aria-label="Fermate della linea ${u.level}">
+    <div class="strip-line">${line.map(x => `<a href="#/u/${x.id}" title="${x.n}. ${esc(plain(x.title))}" class="${x === u ? 'cur' : isDone(x) ? 'done' : ''}"${x === u ? ' aria-current="page"' : ''}></a>`).join('')}</div>
+    <div class="strip-ends">${end(prev, -1)}${end(next, 1)}</div>
   </nav>`;
 }
 function lesson(u) {
-  document.title = `${plain(u.title)} — Fondamenta`;
+  document.title = `${plain(u.title)} — Brexli`;
   const p = data.units[u.id];
-  const a1 = a1Units();
+  const line = lineUnits(u.level);
   app.innerHTML = `<article class="lesson narrow" style="--line:${LV_COLOR[u.level]}">
     ${strip(u)}
-    <header class="sign"><span class="num">${u.n}</span><div><h1>${u.title}</h1><div class="meta">Linea ${u.level}, fermata ${u.n} di ${a1.length}${p ? `. Miglior risultato: ${p.best}%` : ''}</div></div></header>
+    <header class="sign"><span class="num">${u.n}</span><div><h1>${u.title}</h1><div class="meta">Linea ${u.level}, fermata ${u.n} di ${line.length}${p ? `. Miglior risultato: ${p.best}%` : ''}</div></div></header>
     <p class="lede">${u.intro}</p>
     ${u.theory.map(s => s.h === 'Errori tipici'
       ? `<section class="gap"><h2>Mind the gap</h2><p class="sub">Gli errori tipici di chi parte dall'italiano</p><div class="edge"></div>${s.b}</section>`
       : `<h2>${s.h}</h2>${s.b}`).join('')}
     <div class="depart">
-      <div><b>${u.exercises.length} esercizi</b><p>Completi, traduci, correggi. Con almeno l'80% la fermata è superata.</p></div>
+      <div><b>${u.exercises.length} esercizi</b><p>Completi, traduci, correggi e scrivi sotto dettatura. Con almeno l'80% la fermata è superata.</p></div>
       <a class="btn" href="#/u/${u.id}/pratica">Fai gli esercizi</a>
     </div>
   </article>`;
 }
 
 /* ---------- sessione di esercizi ---------- */
-const KIND = { c: 'Scegli la forma corretta', f: 'Completa la frase', t: 'Traduci in inglese', o: 'Metti le parole in ordine', x: "C'è un errore: riscrivi la frase corretta", irr: 'Scrivi il past simple e il participio passato' };
+const KIND = { c: 'Scegli la forma corretta', f: 'Completa la frase', t: 'Traduci in inglese', o: 'Metti le parole in ordine', x: "C'è un errore: riscrivi la frase corretta", irr: 'Scrivi il past simple e il participio passato', d: 'Dettato: ascolta e scrivi la frase' };
 const trackHTML = (n, marks, cur = -1) => `<div class="track" aria-hidden="true">${Array.from({ length: n }, (_, k) => `<i class="${k in marks ? (marks[k] ? 'ok' : 'no') : k === cur ? 'cur' : ''}"></i>`).join('')}</div>`;
 
 function session({ items, back, line, onAnswer, onEnd }) {
@@ -274,6 +495,12 @@ function session({ items, back, line, onAnswer, onEnd }) {
         b.onclick = () => { if (checked) return; c.classList.remove('used'); b.remove(); };
         line.appendChild(b);
       });
+    }
+    if (ex.t === 'd') {
+      const play = slow => say(ex.a[0], slow ? 0.75 : 1);
+      $('#dplay').onclick = () => play(false);
+      $('#dslow').onclick = () => play(true);
+      setTimeout(() => { if (!checked && $('#dplay')) play(false); }, 300);
     }
     if (ex.t === 'c') {
       $$('.opt').forEach(b => b.onclick = () => { if (!checked) check(b.dataset.v); });
@@ -358,15 +585,16 @@ function body(ex) {
   const field = ph => `<input class="line" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${ph}">`;
   if (ex.t === 'c') {
     const opts = shuffle(ex.o);
-    return `<p class="prompt">${esc(ex.q).replace(/___(S*)/, '<span class="nowrap"><span class="gapline"></span>$1</span>')}</p>
+    return `<p class="prompt">${esc(ex.q).replace(/___(\S*)/,'<span class="nowrap"><span class="gapline"></span>$1</span>')}</p>
       <div class="opts">${opts.map((o, k) => `<button class="opt" type="button" data-v="${esc(o)}"><kbd>${k + 1}</kbd>${esc(o)}</button>`).join('')}</div>`;
   }
   if (ex.t === 'f') {
     const w = Math.max(5, Math.max(...ex.a.map(a => a.length)) + 2);
     const [a, b] = esc(ex.q).split('___');
-    const [, tail, rest] = b.match(/^(S*)([sS]*)$/);
+    const [, tail, rest] = b.match(/^(\S*)([\s\S]*)$/);
     return `<p class="prompt">${a}<span class="nowrap"><input class="blank" style="width:${w}ch" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="risposta">${tail}</span>${rest}</p>`;
   }
+  if (ex.t === 'd') return `<div class="dict"><button class="play" type="button" id="dplay">${SPK}Ascolta</button><button class="play slow" type="button" id="dslow">Più lento</button></div>${field('Scrivi quello che senti')}`;
   if (ex.t === 't') return `<p class="prompt">${esc(ex.it)}</p>${field('Scrivi in inglese')}`;
   if (ex.t === 'x') return `<p class="prompt bad">${esc(ex.q)}</p>${field('La frase corretta')}`;
   if (ex.t === 'o') {
@@ -397,8 +625,8 @@ function resultScreen({ right, total, wrong, marks }, { num, title, line, passTe
     ${advice ? `<p style="margin-top:18px">${advice}</p>` : ''}
     ${wrong.length ? `<h2>Da rivedere</h2><ul class="mistakes">${wrong.map(({ it }) => {
       const ex = it.ex;
-      const q = ex.t === 'irr' ? ex.v.it : ex.it || ex.q;
-      const a = ex.t === 'irr' ? `${ex.v.b} – ${ex.v.p} – ${ex.v.pp}` : ex.t === 'c' ? ex.q.replace('___', ex.a) : accepted(ex)[0];
+      const q = ex.t === 'irr' ? ex.v.it : ex.t === 'd' ? 'Dettato' : ex.it || ex.q;
+      const a = ex.t === 'irr' ? `${ex.v.b}, ${ex.v.p1}, ${ex.v.pp1}` : SPEECH.sayTexts(ex)[0] || accepted(ex)[0];
       return `<li><span class="q">${esc(q)}</span>${sayBtn(a)}<span>${esc(a)}</span></li>`;
     }).join('')}</ul>${reviewNote ? `<p class="small">${reviewNote}</p>` : ''}` : ''}
     <div class="actions">${again}</div>
@@ -416,12 +644,13 @@ function trackReview(it, ok) {
     data.review[idx].s++;
     if (data.review[idx].s >= 2) data.review.splice(idx, 1);
   }
+  data.reviewAt = Date.now();
   save();
 }
 const replay = hash => `onclick="location.hash='${hash}';dispatchEvent(new HashChangeEvent('hashchange'));return false"`;
 
 function practiceUnit(u) {
-  document.title = `Esercizi: ${plain(u.title)} — Fondamenta`;
+  document.title = `Esercizi: ${plain(u.title)} — Brexli`;
   const items = shuffle(u.exercises.map((ex, k) => ({ ex, u, k })));
   session({
     items, back: `#/u/${u.id}`, line: LV_COLOR[u.level], onAnswer: trackReview,
@@ -441,7 +670,7 @@ function practiceUnit(u) {
 }
 
 function reviewPage(start) {
-  document.title = 'Ripasso — Fondamenta';
+  document.title = 'Ripasso — Brexli';
   const list = data.review.filter(exerciseOf);
   if (start === 'via' && list.length) {
     const items = shuffle(list).slice(0, 15).map(r => ({ ex: exerciseOf(r), u: UNITS.find(u => u.id === r.u), k: r.k }));
@@ -459,7 +688,7 @@ function reviewPage(start) {
       <p class="lede">Ogni esercizio sbagliato finisce qui, e ci resta finché non lo risolvi due volte di fila.</p>
     </div>
     ${list.length ? `<p style="margin-top:22px"><a class="btn" href="#/ripasso/via">Ripassa ${Math.min(15, list.length)} esercizi</a></p>
-      <ul class="review-list">${Object.entries(byUnit).map(([id, rs]) => { const u = UNITS.find(x => x.id === id); return `<li><a href="#/u/${id}"><span class="n">${u.n}</span><b>${u.stop}</b><span>${rs.length} da ripassare</span></a></li>`; }).join('')}</ul>`
+      <ul class="review-list">${Object.entries(byUnit).map(([id, rs]) => { const u = UNITS.find(x => x.id === id); return `<li><a href="#/u/${id}"><span class="n" style="background:${LV_COLOR[u.level]}">${u.n}</span><b>${u.stop} <small style="font-weight:400;color:var(--muted)">linea ${u.level}</small></b><span>${rs.length} da ripassare</span></a></li>`; }).join('')}</ul>`
     : `<p class="empty">Nessun errore in sospeso. Quando sbagli un esercizio, lo ritrovi qui.</p><a class="btn" href="#/">Torna alla mappa</a>`}
   </section>`;
 }
@@ -467,7 +696,7 @@ routes.ripasso = reviewPage;
 
 /* ---------- officina dei verbi: coniugatore ---------- */
 function verbsPage(q) {
-  document.title = 'Coniugatore — Fondamenta';
+  document.title = 'Coniugatore — Brexli';
   const r = q ? VERBS.find(q) : null;
   app.innerHTML = `<section class="narrow verbs">
     <div class="page-head">
@@ -509,7 +738,7 @@ function conjugation({ v, from, guessed }) {
 
 /* ---------- officina dei verbi: irregolari ---------- */
 function irregularPage() {
-  document.title = 'Verbi irregolari — Fondamenta';
+  document.title = 'Verbi irregolari — Brexli';
   const known = VERBS.IRR.filter(v => (data.irr[v.b] || 0) >= 2).length;
   app.innerHTML = `<section class="narrow verbs">
     <div class="page-head">
@@ -526,7 +755,7 @@ function irregularPage() {
   $('.irrtbl tbody').onclick = e => { if (e.target.closest('.say')) return; const tr = e.target.closest('tr'); if (tr) location.hash = '#/verbi/' + tr.dataset.v; };
 }
 function irregularDrill() {
-  document.title = 'Allenamento irregolari — Fondamenta';
+  document.title = 'Allenamento irregolari — Brexli';
   // i verbi meno sicuri escono più spesso
   const weighted = VERBS.IRR.map(v => ({ v, w: Math.random() * (3 - Math.min(2, data.irr[v.b] || 0)) }))
     .sort((a, b) => b.w - a.w).slice(0, 10).map(x => ({ ex: { t: 'irr', v: x.v } }));
@@ -539,5 +768,7 @@ function irregularDrill() {
 }
 
 updateCount();
+updateNav();
 route();
+if (auth) pullProgress();
 })();

@@ -1,0 +1,17 @@
+{
+  "name": "brexli",
+  "private": true,
+  "description": "Corso gratuito di grammatica inglese per italiani: sito statico e API degli account.",
+  "scripts": {
+    "start": "node server/standalone.mjs",
+    "site": "node serve.js"
+  },
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "express": "^4.21.2",
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "pg-mem": "^3.0.4"
+  }
+}
