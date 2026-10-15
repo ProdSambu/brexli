@@ -1,5 +1,5 @@
 UNIT({
-  id: 'a1-08', n: 8, level: 'A1',
+  id: 'a1-08', n: 8, level: 'A1', stop: 'Can',
   title: '<i>Can</i>, <i>could</i> e l\'imperativo',
   sub: 'Capacità, permesso, richieste; dare istruzioni',
   intro: "Can traduce sapere, potere e riuscire, tutto in una parola. È il primo verbo modale: si comporta in modo diverso da tutti gli altri verbi.",

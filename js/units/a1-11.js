@@ -1,5 +1,5 @@
 UNIT({
-  id: 'a1-11', n: 11, level: 'A1',
+  id: 'a1-11', n: 11, level: 'A1', stop: 'Futuro',
   title: 'Il futuro: <i>will</i>, <i>going to</i>, present continuous',
   sub: 'Decisioni, intenzioni, appuntamenti; il presente dopo when e if',
   intro: "L'italiano parla del futuro quasi sempre con il presente: \"domani vado a Roma\". L'inglese no: ha tre modi diversi, e la scelta dipende da quanto è già deciso.",

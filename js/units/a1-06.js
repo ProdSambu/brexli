@@ -1,5 +1,5 @@
 UNIT({
-  id: 'a1-06', n: 6, level: 'A1',
+  id: 'a1-06', n: 6, level: 'A1', stop: 'There is',
   title: '<i>There is</i>, <i>there are</i>, <i>some</i> e <i>any</i>',
   sub: 'C\'è / ci sono, quantità indefinite, preposizioni di luogo',
   intro: "Per dire che qualcosa esiste o si trova da qualche parte, l'inglese ha una struttura fissa. Insieme a some e any e alle preposizioni di luogo, è quello che serve per descrivere un posto.",

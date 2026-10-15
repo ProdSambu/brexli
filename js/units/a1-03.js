@@ -1,5 +1,5 @@
 UNIT({
-  id: 'a1-03', n: 3, level: 'A1',
+  id: 'a1-03', n: 3, level: 'A1', stop: 'Possesso',
   title: 'Possesso: <i>my</i>, <i>mine</i>, <i>\'s</i> e <i>have got</i>',
   sub: 'Aggettivi e pronomi possessivi, genitivo sassone, have got',
   intro: "Dire di chi è una cosa sembra banale, ma qui l'inglese ragiona al contrario dell'italiano: il possessivo dipende da chi possiede, non dalla cosa posseduta.",

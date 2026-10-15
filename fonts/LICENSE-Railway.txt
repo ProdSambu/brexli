@@ -1,0 +1,3 @@
+Railway Sans — Greg Fleming, open source revival of Edward Johnston's 1916 typeface.
+Source: https://fontlibrary.org/en/font/railway-sans
+License: SIL Open Font License 1.1 (https://openfontlicense.org). Files are distributed unmodified.

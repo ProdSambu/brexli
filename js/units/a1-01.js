@@ -1,5 +1,5 @@
 UNIT({
-  id: 'a1-01', n: 1, level: 'A1',
+  id: 'a1-01', n: 1, level: 'A1', stop: 'To be',
   title: 'Il verbo <i>to be</i>',
   sub: 'Pronomi soggetto, essere al presente, domande e risposte brevi',
   intro: "È il verbo su cui si regge tutto il resto: serve per dire chi sei, come stai, dove sei, quanti anni hai. Ed è anche il primo punto in cui l'inglese smette di somigliare all'italiano.",

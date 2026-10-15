@@ -22,28 +22,28 @@ window.N = html => `<aside class="note">${html}</aside>`;
 window.ERR = (...items) =>
   `<ul class="errs">${items.map(([w, r, why]) => `<li><span class="wrong">${w}</span><span class="arrow">→</span><span class="right">${r}</span>${why ? `<span class="why">${why}</span>` : ''}</li>`).join('')}</ul>`;
 
-// Percorso: unità previste dopo l'A1
+// Percorso: le linee dopo l'A1, ancora in costruzione. stop = nome breve della fermata sulla mappa
 window.ROADMAP = [
   { lv: 'A2', name: 'Raccontare e confrontare', desc: 'Il passato che arriva fino a oggi, le quantità, i doveri.', units: [
-    'Present perfect: esperienze (ever, never)',
-    'Present perfect: just, already, yet',
-    'Present perfect con for e since',
-    'Present perfect o past simple?',
-    'Past continuous e past simple',
-    'Much, many, a lot of, a few, a little',
-    'Must, have to, should',
-    'Something, anything, nothing, everywhere…',
-    'Il primo condizionale (if + presente)',
-    'Verbo + -ing o verbo + to',
-  ] },
+    ['Ever e never', 'Present perfect: esperienze (ever, never)'],
+    ['Just, already, yet', 'Present perfect: just, already, yet'],
+    ['For e since', 'Present perfect con for e since'],
+    ['Perfect o past?', 'Present perfect o past simple?'],
+    ['Past continuous', 'Past continuous e past simple'],
+    ['Much e many', 'Much, many, a lot of, a few, a little'],
+    ['Must e have to', 'Must, have to, should'],
+    ['Something', 'Something, anything, nothing, everywhere'],
+    ['If + presente', 'Il primo condizionale (if + presente)'],
+    ['-ing o to', 'Verbo + -ing o verbo + to'],
+  ].map(([stop, title]) => ({ stop, title })) },
   { lv: 'B1', name: 'Frasi complesse', desc: 'Ipotesi, passivo, discorso indiretto, frasi relative.', units: [
-    'Past perfect',
-    'Il passivo',
-    'Il secondo condizionale',
-    'Il discorso indiretto',
-    'Frasi relative: who, which, that, whose',
-    'Used to e would',
-    'Il terzo condizionale e wish',
-    'Phrasal verbs essenziali',
-  ] },
+    ['Past perfect', 'Past perfect'],
+    ['Passivo', 'Il passivo'],
+    ['If + would', 'Il secondo condizionale'],
+    ['Discorso indiretto', 'Il discorso indiretto'],
+    ['Who, which, that', 'Frasi relative: who, which, that, whose'],
+    ['Used to', 'Used to e would'],
+    ['Wish', 'Il terzo condizionale e wish'],
+    ['Phrasal verbs', 'Phrasal verbs essenziali'],
+  ].map(([stop, title]) => ({ stop, title })) },
 ];

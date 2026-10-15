@@ -1,5 +1,5 @@
 UNIT({
-  id: 'a1-05', n: 5, level: 'A1',
+  id: 'a1-05', n: 5, level: 'A1', stop: 'Do e does',
   title: 'Present simple: negazioni e domande',
   sub: 'L\'ausiliare do / does, risposte brevi, avverbi di frequenza',
   intro: "L'italiano fa la negazione con \"non\" e la domanda con l'intonazione. L'inglese ha bisogno di un verbo in più, do, che non si traduce ma regge tutta la frase.",

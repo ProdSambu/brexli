@@ -1,5 +1,5 @@
 UNIT({
-  id: 'a1-12', n: 12, level: 'A1',
+  id: 'a1-12', n: 12, level: 'A1', stop: 'Comparativi',
   title: 'Comparativi e superlativi',
   sub: '-er / more, the -est / the most, than, as … as',
   intro: "Più grande, il più caro, alto come suo padre. Le regole dipendono dalla lunghezza dell'aggettivo, e ci sono tre irregolari che si usano continuamente.",

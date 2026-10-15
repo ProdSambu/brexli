@@ -1,5 +1,5 @@
 UNIT({
-  id: 'a1-10', n: 10, level: 'A1',
+  id: 'a1-10', n: 10, level: 'A1', stop: 'Past simple',
   title: 'Past simple: regolari e irregolari',
   sub: '-ed e la sua pronuncia, i verbi irregolari, did e didn\'t',
   intro: "È il tempo del racconto: cosa hai fatto ieri, dove sei andato in vacanza. Si forma in modo semplice, ma i verbi più usati sono proprio quelli irregolari.",

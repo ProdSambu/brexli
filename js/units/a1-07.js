@@ -1,5 +1,5 @@
 UNIT({
-  id: 'a1-07', n: 7, level: 'A1',
+  id: 'a1-07', n: 7, level: 'A1', stop: 'Present continuous',
   title: 'Present continuous',
   sub: 'Azioni in corso, situazioni temporanee, la differenza con il present simple',
   intro: "\"Cosa fai?\" in italiano può voler dire due cose: che lavoro fai, o cosa stai facendo adesso. In inglese sono due tempi diversi, e sbagliare cambia il senso della frase.",

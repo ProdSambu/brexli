@@ -1,5 +1,5 @@
 UNIT({
-  id: 'a1-02', n: 2, level: 'A1',
+  id: 'a1-02', n: 2, level: 'A1', stop: 'Articoli',
   title: 'Articoli, plurali, <i>this</i> e <i>that</i>',
   sub: 'a / an / the, quando non si usa l\'articolo, plurali regolari e irregolari',
   intro: "L'inglese ha meno articoli dell'italiano ma li usa con regole diverse: dove noi lo mettiamo sempre, spesso loro non lo mettono affatto. Qui si vede quando sì e quando no.",

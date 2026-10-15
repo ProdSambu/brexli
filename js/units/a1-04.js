@@ -1,5 +1,5 @@
 UNIT({
-  id: 'a1-04', n: 4, level: 'A1',
+  id: 'a1-04', n: 4, level: 'A1', stop: 'Present simple',
   title: 'Present simple: forma affermativa',
   sub: 'Abitudini e fatti, la -s della terza persona, regole di scrittura',
   intro: "Il primo vero tempo verbale. È facilissimo da formare, ma ha una trappola che resta attaccata per anni: la -s alla terza persona singolare.",

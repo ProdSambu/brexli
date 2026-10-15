@@ -1,5 +1,5 @@
 UNIT({
-  id: 'a1-09', n: 9, level: 'A1',
+  id: 'a1-09', n: 9, level: 'A1', stop: 'Was e were',
   title: 'Il passato di <i>be</i>: <i>was</i> e <i>were</i>',
   sub: 'Ero, sono stato, c\'era; nascere; le espressioni di tempo passato',
   intro: "Il primo passo nel passato. Due sole forme, was e were, che coprono quello che in italiano è ero, fui, sono stato.",
