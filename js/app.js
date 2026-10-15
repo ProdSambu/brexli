@@ -102,8 +102,18 @@ async function pullProgress({ rerender = true } = {}) {
     setSync(e.status ? 'error' : 'offline', e.message);
   }
 }
+// Il server gratuito dorme quando nessuno lo usa. Come CacioPlay, si sveglia quando qualcuno entra:
+// appena si apre il sito (o si torna sulla scheda dopo un po') gli si manda una richiesta leggera,
+// così mentre si legge la mappa o una lezione si accende e il login è già pronto.
+let lastWake = 0;
+function wakeServer() {
+  if (Date.now() - lastWake < 5 * 60000) return;
+  lastWake = Date.now();
+  fetch(API + '/health', { cache: 'no-store' }).catch(() => {});
+}
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && auth && Date.now() - sync.at > 60000) pullProgress();
+  if (document.visibilityState !== 'visible') return;
+  if (auth && Date.now() - sync.at > 60000) pullProgress(); else wakeServer();
 });
 function updateNav() {
   const a = $('#acct'); if (!a) return;
@@ -157,8 +167,7 @@ function accountPage() {
 }
 
 function loginView(mode = 'login') {
-  // il servizio gratuito dorme quando nessuno lo usa: lo svegliamo mentre si compila il modulo
-  fetch(API + '/health').catch(() => {});
+  wakeServer();
   const reg = mode === 'register';
   const local = Object.keys(data.units).length;
   app.innerHTML = `<section class="narrow account">
@@ -770,5 +779,5 @@ function irregularDrill() {
 updateCount();
 updateNav();
 route();
-if (auth) pullProgress();
+if (auth) pullProgress(); else wakeServer();
 })();
