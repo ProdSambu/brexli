@@ -2,23 +2,30 @@ UNIT({
   id: 'a1-07', n: 7, level: 'A1', stop: 'Present continuous',
   title: 'Present continuous',
   sub: 'Azioni in corso, situazioni temporanee, la differenza con il present simple',
-  intro: "\"Cosa fai?\" in italiano può voler dire due cose: che lavoro fai, o cosa stai facendo adesso. In inglese sono due tempi diversi, e sbagliare cambia il senso della frase.",
+  intro: "In italiano \"cosa fai?\" può voler dire due cose: che lavoro fai, oppure cosa stai facendo adesso. In inglese sono due tempi diversi. Questo è quello per <b>adesso</b>: corrisponde al nostro \"sto facendo\".",
   theory: [
     { h: 'Come si forma', b: `
-      <p><b>be</b> (am / is / are) + verbo in <b>-ing</b>.</p>
+      <p>È uguale all'italiano "<b>sto</b> mangi<b>ando</b>": due pezzi. Al posto di "sto, stai, sta" metti <b>am / is / are</b>; al posto di "-ando / -endo" metti <b>-ing</b>.</p>
       ${T(['Affermativa', 'Negativa', 'Domanda'], [["I'm working", "I'm not working", 'Am I working?'], ["you're working", "you aren't working", 'Are you working?'], ["he / she / it's working", "he / she / it isn't working", 'Is he / she / it working?'], ["we / they're working", "we / they aren't working", 'Are we / they working?']], 'plain')}
-      ${EX(["I'm writing an email.", 'Sto scrivendo una mail.'], ["It's raining.", 'Sta piovendo.'], ['What are you doing?', 'Cosa stai facendo?'])}` },
+      ${EX(["I'm writing an email.", 'Sto scrivendo una mail.'], ["It's raining.", 'Sta piovendo.'], ['What are you doing?', 'Cosa stai facendo?'])}
+      ${TIP(`<p><b>sto</b> + mangi<b>ando</b> = <b>I'm</b> + eat<b>ing</b>. Due pezzi in italiano, due pezzi in inglese: se ne scrivi uno solo (<i>I eating</i>), manca qualcosa.</p><p>Negativa e domanda funzionano come con <i>be</i> alla fermata 1: <i>I'm not eating</i>, <i>Are you eating?</i></p>`)}` },
     { h: 'Regole di scrittura dell\'-ing', b: `
+      <p>Quasi sempre basta aggiungere <b>-ing</b>. Ci sono tre piccoli casi in cui la parola cambia:</p>
       ${T(['Il verbo finisce in…', 'Regola', 'Esempi'], [['-e muta', 'cade la e', 'write → writing, make → making, have → having'], ['-ie', 'ie → y', 'lie → lying, die → dying'], ['consonante-vocale-consonante, accento sull\'ultima sillaba', 'si raddoppia la consonante', 'sit → sitting, run → running, stop → stopping, begin → beginning'], ['tutti gli altri', '+ ing', 'play → playing, eat → eating, open → opening']], 'plain')}
-      ${N("<p>Non si raddoppia se l'accento non è sull'ultima sillaba (<i>open → opening, visit → visiting</i>) o se la consonante finale è w, x, y (<i>show → showing, fix → fixing</i>). Nell'inglese britannico una l finale preceduta da una sola vocale si raddoppia anche senza accento: <i>travel → travelling, cancel → cancelling</i> (in americano <i>traveling</i>).</p>")}` },
+      ${N("<p>La consonante non raddoppia quando la voce non cade sulla fine della parola (<i>open → opening, visit → visiting</i>) e non raddoppiano mai w, x, y (<i>show → showing, fix → fixing</i>).</p><p>Nell'inglese britannico la <b>l</b> finale raddoppia sempre: <i>travel → travelling</i> (in americano <i>traveling</i>).</p>")}
+      ${TIP(`<p>Per il raddoppio pensa a un panino: <b>consonante + vocale + consonante</b> (s-i-t, r-u-n, s-t-o-p). Se la parola finisce così, la consonante finale si raddoppia per "proteggere" la vocale: <i>sit<b>t</b>ing, run<b>n</b>ing, stop<b>p</b>ing</i>.</p>`)}` },
     { h: 'Quando si usa', b: `
-      ${T(['Uso', 'Esempio'], [['azione in corso adesso', "Be quiet, the baby<b>'s sleeping</b>."], ['situazione temporanea', "I<b>'m working</b> from home this week."], ['cambiamento in corso', "It<b>'s getting</b> dark."], ['programmi futuri già fissati (unità 11)', "I<b>'m meeting</b> Anna tomorrow."]], 'plain')}
-      <p>Parole che spesso lo accompagnano: <i>now, right now, at the moment, today, this week, these days, Look!, Listen!</i></p>` },
+      <p>Per quello che succede <b>proprio adesso</b>, o <b>in questo periodo</b> e poi finirà.</p>
+      ${T(['Uso', 'Esempio'], [['azione in corso adesso', "Be quiet, the baby<b>'s sleeping</b>."], ['situazione temporanea', "I<b>'m working</b> from home this week."], ['cambiamento in corso', "It<b>'s getting</b> dark."], ['programmi futuri già fissati (fermata 11)', "I<b>'m meeting</b> Anna tomorrow."]], 'plain')}
+      <p>Lo riconosci da parole come <i>now</i> (adesso), <i>right now</i> (proprio adesso), <i>at the moment</i> (in questo momento), <i>today, this week</i>, e da <i>Look!</i> (guarda!) e <i>Listen!</i> (ascolta!).</p>
+      ${TIP(`<p>Se in italiano puoi dire <b>"sto + -ando / -endo"</b> (sto lavorando, sta piovendo), in inglese usi il present continuous.</p>`)}` },
     { h: 'Simple o continuous?', b: `
+      <p>Il present simple è per le cose <b>di sempre</b>, il present continuous per le cose <b>di adesso</b>:</p>
       ${T(['Present simple', 'Present continuous'], [['abitudine, cosa permanente', 'ora, cosa temporanea'], ['I <b>work</b> in Milan. (è il mio lavoro)', "I<b>'m working</b> in Milan this month. (per ora)"], ['What <b>do</b> you <b>do</b>? (che lavoro fai?)', 'What <b>are</b> you <b>doing</b>? (cosa stai facendo?)'], ['It <b>rains</b> a lot in London.', "It<b>'s raining</b>. Take an umbrella."]], 'plain')}
-      <p>I <b>verbi di stato</b> visti nell'unità 4 (know, like, want, need, understand, believe, belong...) restano al simple anche se parli di adesso.</p>
+      <p>Ricordati dei <b>verbi di stato</b> della fermata 4 (<i>know, like, want, need, understand, believe…</i>): restano al simple anche se parli di adesso.</p>
       ${EX(['I <b>know</b> what you mean.', 'So cosa intendi.'], ['I <b>want</b> a coffee.', 'Voglio un caffè.'])}
-      ${N("<p><b>Have</b> nel senso di possedere è di stato (<i>I have a car</i>), ma nelle espressioni d'azione va al continuous: <i>I'm having breakfast, She's having a shower, We're having fun</i>. Lo stesso per <b>think</b>: <i>I think so</i> (opinione) ma <i>I'm thinking about it</i> (ci sto pensando).</p>")}` },
+      ${N("<p><b>Have</b> quando vuol dire \"possedere\" è uno stato (<i>I have a car</i>). Quando è un'azione invece va in -ing: <i>I'm having breakfast</i> (sto facendo colazione), <i>She's having a shower</i> (si sta facendo la doccia).</p><p>Lo stesso vale per <b>think</b>: <i>I think so</i> (penso di sì, è un'opinione) ma <i>I'm thinking about it</i> (ci sto pensando).</p>")}
+      ${TIP(`<p>Fatti una domanda: <b>"Di solito o adesso?"</b> Di solito → <i>I work</i>. Adesso → <i>I'm working</i>.</p><p>E se il verbo è "invisibile" (sapere, volere, piacere), resta sempre al simple.</p>`)}` },
     { h: 'Errori tipici', b: ERR(
       ['I am knowing the answer.', 'I know the answer.', 'Know è un verbo di stato.'],
       ['Look! It rains.', "Look! It's raining.", 'Sta succedendo adesso.'],

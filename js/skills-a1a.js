@@ -24,7 +24,7 @@
     return null;
   }
   add('a1-01', 'be-form', 'Forma affermativa', 'Le forme di be: am, is, are',
-    'Il verbo be cambia con il soggetto: I am (I\'m), he / she / it is (\'s), we / you / they are (\'re). Un soggetto come my brother vale he; my parents vale they.',
+    "Be cambia secondo chi c'è prima: I am; is per una persona o una cosa sola (he, she, it, my brother, Anna); are per you e per più persone o cose (we, they, my parents). Forme corte: I'm, she's, they're.",
     () => {
       const s = pick(SUBJ), c = pick(BE_C), be = BE[s.p];
       const m = pick(['fill', 'fill', 'choice', 'tr', 'tr', 'fix']);
@@ -39,7 +39,7 @@
     });
 
   add('a1-01', 'be-neg-q', ['Forma negativa', 'Domande e risposte brevi'], 'Be: negativa, domande e risposte brevi',
-    'Negativa: be + not (I\'m not, she isn\'t, they aren\'t). Domanda: be va prima del soggetto (Are you tired? Is she at home?). Be non usa mai do. Risposte brevi: Yes, I am / No, I\'m not (mai "Yes, I\'m").',
+    "Per dire \"non\" metti not dopo be: I'm not, she isn't, they aren't. Per la domanda scambia di posto be e il soggetto: you are → Are you…? Be non usa mai do. Risposta breve: Yes, I am (mai Yes, I'm).",
     () => {
       const s = pick(SUBJ), c = pick(BE_C), be = BE[s.p];
       const neg = be === 'am' ? ["'m not", 'am not'] : [`${be}n't`, `${be} not`];
@@ -63,7 +63,7 @@
   const AVERE = [['fame', 'hungry'], ['sete', 'thirsty'], ['freddo', 'cold'], ['caldo', 'hot'], ['sonno', 'sleepy', ['tired']], ['paura', 'afraid', ['scared']],
     ['ragione', 'right'], ['torto', 'wrong'], ['fretta', 'in a hurry']];
   add('a1-01', 'be-not-have', "Quando l'italiano dice avere", 'Età, fame, freddo: be, non have',
-    'Dove l\'italiano usa avere (ho 20 anni, ho fame, ho freddo, hai ragione) l\'inglese usa be: I\'m 20, I\'m hungry, I\'m cold, you\'re right. L\'età è be + numero (+ years old, mai solo years).',
+    "Per età, fame, sete, freddo, caldo, paura e ragione l'italiano usa avere, l'inglese be: I'm 20, I'm hungry, I'm cold, you're right. Trucco: pensa \"sono affamato\", \"sono ventenne\". L'età: I'm 20 o I'm 20 years old, mai solo years.",
     () => {
       const s = pick(SUBJ_TR), be = BE[s.p], m = pick(['tr', 'tr', 'tr', 'fix', 'choice']);
       const dHave = x => /\b(have|has|had)\b/i.test(x) ? `In italiano si dice "avere fame / avere ${'20'} anni", ma in inglese queste cose si dicono con ${b('be')}: ${s.en} ${be} …, non ${s.en} ${LEX.is3(s) ? 'has' : 'have'} ….` : null;
@@ -84,7 +84,7 @@
     ['È lontano', 'far'], ['È facile', 'easy'], ['È difficile', 'difficult', ['hard']], ['È mezzanotte', 'midnight'], ['Sono le otto', "eight o'clock", ['eight']], ['È mezzogiorno', 'midday', ['noon', '12']]];
   const DAY = [['oggi', 'today'], ['', ''], ['', ''], ['qui', 'here'], ['stasera', 'tonight']];
   add('a1-01', 'subject-it', 'I pronomi soggetto', 'Il soggetto non si omette: it',
-    'In inglese il soggetto va sempre espresso, anche dove l\'italiano non lo mette. Per tempo, ore, distanze e giudizi il soggetto è it: It\'s cold, It\'s late, It\'s easy.',
+    "In inglese chi fa l'azione va sempre detto. Se in italiano il soggetto non c'è (fa freddo, è tardi, è facile), in inglese si mette it: It's cold, It's late, It's easy.",
     () => {
       const [it, en, alt] = pick(IT_EXPR);
       // "oggi / qui / stasera" solo dove suona naturale (fa freddo oggi, sì; è lontano oggi, no)
@@ -108,7 +108,7 @@
     : tag === 'one' ? `${b('one')} si pronuncia /wʌn/, con un suono consonantico: quindi ${b('a')}.`
     : art === 'an' ? `${b(noun.split(' ')[0])} comincia con un suono vocalico: ${b('an')}.` : `${b(noun.split(' ')[0])} comincia con un suono consonantico: ${b('a')}.`;
   add('a1-02', 'a-an', 'A o an: conta il suono', 'A o an',
-    'L\'articolo è a davanti a un suono consonantico, an davanti a un suono vocalico. Conta il suono, non la lettera: an hour (h muta), a university (/ju/). Con le professioni l\'articolo serve sempre: she\'s a doctor.',
+    "A e an vogliono dire un / una. Conta il suono, non la lettera: an davanti al suono di una vocale (an apple, an hour: l'h non si sente), a davanti al suono di una consonante (a book, a university: si sente \"iu\"). Con i mestieri serve sempre: she's a doctor.",
     () => {
       if (coin(0.35)) {
         const [art, job, it] = pick(JOBS), s = pick(SUBJ_TR.filter(x => is3(x)));
@@ -127,7 +127,7 @@
     ['The time is money.', 'Time is money.'], ['I like the music.', 'I like music.'], ['The English is easy.', 'English is easy.'], ['My friends are at the home.', 'My friends are at home.'],
     ['She plays the football.', 'She plays football.'], ['We have the lunch at one.', 'We have lunch at one.']];
   add('a1-02', 'no-article', 'The, e quando non si mette', 'The: quando non si mette',
-    'Quando parli di qualcosa in generale l\'inglese non mette l\'articolo: I love music, Dogs are loyal, Life is short. Niente articolo anche con lingue, sport, pasti e in at home, at work. The si usa per una cosa specifica: the music in this film.',
+    "Quando parli di una cosa in generale, in inglese niente the: I love music, Dogs are loyal, Life is short. The solo per una cosa precisa (the music in this film). Niente articolo anche con lingue, sport, pasti e in at home, at work.",
     () => {
       const m = pick(['tr', 'tr', 'fix', 'choice']);
       if (m === 'fix') { const [w, r] = pick(GENERIC_FIX); return F.fix(w, [r], { why: 'Si parla in generale (o è un\'espressione fissa): niente the.' }); }
@@ -159,7 +159,7 @@
     same: (s, p) => `${b(s)} al plurale non cambia: one ${s}, two ${p}.`,
   };
   add('a1-02', 'plurals', 'I plurali', 'I plurali',
-    'Plurale: di solito + s. Dopo -s, -sh, -ch, -x e molti -o: + es. Consonante + y: -ies (city → cities). Molti -f / -fe: -ves (knife → knives). Irregolari da imparare: men, women, children, people, feet, teeth, mice. Uguali: sheep, fish.',
+    "Di solito + s (books). Dopo -s, -sh, -ch, -x e molti -o: + es (boxes, watches, potatoes). Consonante + y: -ies (city → cities); vocale + y: solo -s (days). Molti -f / -fe: -ves (knife → knives). Da imparare: men, women, children, people, feet, teeth, mice; uguali: sheep, fish.",
     () => {
       const [s, p, tag] = pick(PLURAL), n = pick(['two', 'three', 'four', 'five', 'six']);
       const why = PL_WHY[tag](s, p);
@@ -170,7 +170,7 @@
   const DEM_N = ['book', 'car', 'house', 'bag', 'phone', 'chair', 'jacket', 'picture'];
   const DEM_P = ['books', 'shoes', 'keys', 'glasses', 'chairs', 'flowers', 'photos', 'boxes'];
   add('a1-02', 'this-that', 'This, that, these, those', 'This, that, these, those',
-    'This (questo) e these (questi) per le cose vicine; that (quello) e those (quelli) per le cose lontane. This e that col singolare, these e those col plurale.',
+    "Vicino (qui): this (questo) e these (questi). Lontano (là): that (quello) e those (quelli). These e those, le parole più lunghe, sono per più cose.",
     () => {
       const plural = coin(), near = coin(), n = pick(plural ? DEM_P : DEM_N);
       const a = plural ? (near ? 'These' : 'Those') : (near ? 'This' : 'That');
@@ -188,7 +188,7 @@
   const THINGS3 = [['wife', 'sua moglie', 'la loro moglie'], ['husband', 'suo marito', null], ['brother', 'suo fratello', 'il loro fratello'], ['sister', 'sua sorella', 'la loro sorella'],
     ['mother', 'sua madre', 'la loro madre'], ['dog', 'il suo cane', 'il loro cane'], ['car', 'la sua macchina', 'la loro macchina'], ['house', 'la sua casa', 'la loro casa'], ['friends', 'i suoi amici', 'i loro amici']];
   add('a1-03', 'his-her', 'Aggettivi possessivi', 'His, her, their: conta chi possiede',
-    'In italiano suo / sua si accorda con la cosa posseduta; in inglese conta chi possiede: his se è un uomo, her se è una donna, their se sono più persone. Marco and his wife, Giulia and her brother. Niente articolo: my car, non the my car.',
+    "Conta chi è il padrone, non la cosa: his se è un uomo, her se è una donna, their se sono più persone. Marco and his wife, Giulia and her brother. Mai the davanti: my car, non the my car.",
     () => {
       const [o, g, oit] = pick(OWNERS), poss = g === 'm' ? 'his' : g === 'f' ? 'her' : 'their';
       let th = pick(THINGS3); if (g === 'p') th = pick(THINGS3.filter(t => t[2] && !['wife', 'husband', 'brother', 'sister'].includes(t[0])));
@@ -204,7 +204,7 @@
   const PRONS = [['me', 'mine', 'mio', 'mia', 'miei', 'mie'], ['you', 'yours', 'tuo', 'tua', 'tuoi', 'tue'], ['him', 'his', 'di lui'], ['her', 'hers', 'di lei'], ['us', 'ours', 'nostro', 'nostra', 'nostri', 'nostre'], ['them', 'theirs', 'loro']];
   const PNOUN = [['book', 'Questo libro', 'm'], ['bag', 'Questa borsa', 'f'], ['phone', 'Questo telefono', 'm'], ['umbrella', 'Questo ombrello', 'm'], ['car', 'Questa macchina', 'f'], ['keys', 'Queste chiavi', 'fp'], ['shoes', 'Queste scarpe', 'fp'], ['books', 'Questi libri', 'mp']];
   add('a1-03', 'poss-pronouns', 'Pronomi possessivi', 'Mine, yours, his, hers…',
-    'Quando il possessivo sostituisce la cosa si usano i pronomi: mine, yours, his, hers, ours, theirs. Senza articolo: This book is mine (non the mine).',
+    "Quando dici \"è mio\" senza ripetere la cosa usi mine, yours, his, hers, ours, theirs, senza the: This book is mine (non the mine). My va con la cosa (my book), mine sta da solo.",
     () => {
       const [obj, pron, ...itf] = pick(PRONS), [n, nit, g] = pick(PNOUN), pl = /p$/.test(g), be = pl ? 'are' : 'is';
       const itPron = itf.length === 1 ? itf[0] : itf[{ m: 0, f: 1, mp: 2, fp: 3 }[g]];
@@ -219,7 +219,7 @@
   const GTHING = [['car', 'La macchina', 'is red', 'è rossa'], ['house', 'La casa', 'is big', 'è grande'], ['room', 'La camera', 'is small', 'è piccola'], ['dog', 'Il cane', 'is old', 'è vecchio'], ['phone', 'Il telefono', 'is new', 'è nuovo'], ['office', "L'ufficio", 'is in Milan', 'è a Milano']];
   const gen = o => /s$/.test(o) && o !== 'boss' ? `${o}'` : `${o}'s`;
   add('a1-03', 'genitive', "Il genitivo sassone: 's", "Il genitivo sassone ('s)",
-    "Per dire di chi è una cosa, l'inglese mette il possessore prima, con 's: my father's car (la macchina di mio padre). Se il possessore è un plurale in -s basta l'apostrofo: my parents' house. Plurali irregolari: the children's toys.",
+    "Per dire \"la cosa di qualcuno\" metti prima il padrone, poi 's, poi la cosa: my father's car (la macchina di mio padre). Se il padrone è un plurale che finisce in -s basta l'apostrofo: my parents' house. Ma: the children's toys.",
     () => {
       const [o, oit] = pick(GOWN), [th, thit, pred, predIt] = pick(GTHING), g = gen(o);
       const why = /'$/.test(g) ? `${b(o)} è un plurale in -s: basta l'apostrofo, ${b(g)} ${th}.` : `Possessore + 's, poi la cosa: ${b(`my ${g} ${th}`)}.`;
@@ -232,7 +232,7 @@
 
   const GOT = [['two sisters', 'due sorelle'], ['a dog', 'un cane'], ['a new car', 'una macchina nuova'], ['blue eyes', 'gli occhi azzurri'], ['a cold', 'il raffreddore'], ['three children', 'tre figli', ['three kids']], ['a big garden', 'un giardino grande'], ['a brother', 'un fratello']];
   add('a1-03', 'have-got', 'Have got', 'Have got',
-    'Have got significa avere (possesso, famiglia, aspetto, malanni): I\'ve got, she\'s got (\'s = has), I haven\'t got, Have you got…? Al posto di have got si può usare have da solo con do: I have, Do you have…?',
+    "Have got = avere. I've got, you've got, we've got, they've got; con he, she, it: has got (she's got, dove 's = has). Negativa: haven't / hasn't got. Domanda: Have you got…? Has she got…?",
     () => {
       const s = pick(SUBJ), [x, xit, xalt] = pick(GOT), h = is3(s) ? 'has' : 'have', m = pick(['fill', 'neg', 'q', 'tr', 'tr', 'fix']);
       const why = `Con ${s.pr} si usa ${b(h + ' got')}${is3(s) ? ' (he, she, it vogliono has)' : ''}.`;
@@ -250,7 +250,7 @@
   /* =================== A1-04: present simple affermativo =================== */
   const presWhy = (s, v) => is3(s) ? `${LEX.subjDesc(s)} è terza persona singolare: al present simple il verbo prende la -s, ${b(v.third)}.` : `${LEX.subjDesc(s)} non è he / she / it: niente -s, ${b(v.b)}.`;
   add('a1-04', 'third-s', ['Come si forma', 'Quando si usa'], 'Present simple: la -s di he, she, it',
-    'Il present simple si usa per abitudini e fatti (every day, on Mondays). Si forma con il verbo base per tutte le persone, ma con he, she, it (e soggetti singolari come my brother, Anna) il verbo prende la -s: she works, they work.',
+    "Il present simple è per le cose di tutti i giorni (every day, on Mondays). Il verbo è uguale per tutti, ma con he, she, it (e con una persona o una cosa sola: my brother, Anna) prende la -s: she works, they work.",
     () => {
       const s = pick(coin(0.6) ? SUBJ.filter(is3) : SUBJ.filter(x => !is3(x))), a = pick(ACT), t = pick(T_PRES), v = a.v;
       const form = is3(s) ? v.third : v.b, m = pick(['fill', 'fill', 'choice', 'fix', 'tr', 'tr', 'ord']);
@@ -273,7 +273,7 @@
     : `Vocale + y: si aggiunge solo -s (${v.b} → ${b(v.third)}).`;
   const badThird = v => v.b === 'have' ? 'haves' : /ies$/.test(v.third) ? v.b + 's' : /es$/.test(v.third) ? v.b + 's' : v.b.replace(/y$/, 'ies');
   add('a1-04', 'spelling-s', 'Regole di scrittura della -s', 'Come si scrive la -s: -es, -ies, has',
-    'Terza persona del present simple: dopo -s, -sh, -ch, -x, -o si aggiunge -es (watches, goes); consonante + y diventa -ies (studies), ma vocale + y vuole solo -s (plays). Have diventa has.',
+    "Quasi sempre + s. Dopo -s, -sh, -ch, -x, -o: + es (watches, goes), perché altrimenti non si riesce a pronunciare. Consonante + y: -ies (studies); vocale + y: solo -s (plays). Have diventa has.",
     () => {
       const vb = pick(SPELL), v = V(vb), a = ACT.find(x => x.v.b === vb), rest = a ? a.rest : SPELL_REST[vb], s = pick(SUBJ.filter(is3)), t = pick(T_PRES);
       const why = spellWhy(v), diag = x => { const w = lastWord(x); return w === v.b ? presWhy(s, v) : spellingHint(w, v.third) || (w !== v.third ? why : null); };
@@ -282,7 +282,7 @@
     });
 
   add('a1-04', 'time-position', 'Le espressioni di tempo', 'Dove va l\'espressione di tempo',
-    'Le espressioni di tempo (every day, on Mondays, twice a week) vanno in fondo alla frase o all\'inizio, mai tra il verbo e il complemento: I go to the gym every day, non I go every day to the gym.',
+    "Le parole che dicono quando (every day, on Mondays, twice a week) vanno in fondo alla frase o all'inizio, mai in mezzo: I go to the gym every day, non I go every day to the gym.",
     () => {
       const s = pick(SUBJ_TR), a = pick(ACT_TR), t = pick(T_PRES), f = is3(s) ? a.v.third : a.v.b;
       const acc = enVariants(s, f, a, t, { altVerb: vb => is3(s) ? vb.third : vb.b });
@@ -301,7 +301,7 @@
     return dBaseAfter(`${d}n't`, v, x);
   }
   add('a1-05', 'neg-do', "La negativa: don't e doesn't", "Negativa: don't / doesn't + verbo base",
-    'Per la negativa del present simple serve l\'ausiliare: don\'t (do not) con I, you, we, they; doesn\'t (does not) con he, she, it. Dopo don\'t / doesn\'t il verbo torna alla forma base: she doesn\'t work (mai doesn\'t works).',
+    "Per dire \"non\" con i verbi normali serve don't (con I, you, we, they) o doesn't (con he, she, it). Il verbo dopo resta così com'è, perché la -s se l'è presa does: she doesn't work, mai she doesn't works.",
     () => {
       const s = pick(SUBJ), a = pick(ACT), v = a.v, d = is3(s) ? 'does' : 'do', m = pick(['fill', 'choice', 'fix', 'tr', 'tr']);
       if (m === 'fill') return F.fill(`${enSubj(s, 1)} ___ ${a.rest}.`, [`${d}n't ${v.b}`, `${d} not ${v.b}`], `not / ${v.b}`, { why: negWhy(s), diag: x => dNeg(s, v, x) });
@@ -331,7 +331,7 @@
     return null;
   }
   add('a1-05', 'question-do', 'Le domande: do e does', 'Domande: Do / Does + soggetto + verbo base',
-    'Le domande al present simple: (parola interrogativa) + Do / Does + soggetto + verbo base. Does con he, she, it; Do con gli altri. Where does she work? Do you speak French? Risposte brevi: Yes, I do / No, she doesn\'t.',
+    "Per la domanda metti Do (o Does con he, she, it) all'inizio, poi chi fa l'azione, poi il verbo così com'è: Do you speak French? Where does she work? Risposta breve: Yes, I do / No, she doesn't.",
     () => {
       const s = pick(SUBJ), a = pick(ACT), v = a.v, d = is3(s) ? 'does' : 'do', m = pick(['fill', 'choice', 'fix', 'tr', 'tr', 'trwh']);
       if (m === 'fill') return F.fill(`___ ${s.en} ${v.b} ${a.rest}?`, [cap(d)], null, { why: is3(s) ? 'Con he, she, it la domanda usa Does.' : 'Con I, you, we, they la domanda usa Do.', diag: x => /^(is|are|am)$/i.test(x.trim()) ? `${b(v.b)} è un verbo normale, non be: la domanda si fa con ${b(cap(d))}.` : dQuestion(s, v, x) });
@@ -355,7 +355,7 @@
   const ADV = [['always', 'sempre'], ['usually', 'di solito'], ['often', 'spesso'], ['sometimes', 'a volte'], ['never', 'mai']];
   const BEADJ = [['tired', { m: 'stanco', f: 'stanca', mp: 'stanchi' }], ['late', 'in ritardo'], ['happy', { m: 'felice', f: 'felice', mp: 'felici' }], ['busy', { m: 'impegnato', f: 'impegnata', mp: 'impegnati' }]];
   add('a1-05', 'freq-adverbs', 'Avverbi di frequenza', 'Always, usually, never…: dove vanno',
-    'Gli avverbi di frequenza (always, usually, often, sometimes, never) vanno prima del verbo principale ma dopo be: She often drinks coffee; She is always late. Never è già negativo: I never eat meat (non I don\'t never).',
+    "Always, usually, often, sometimes, never vanno prima del verbo (She often drinks coffee) ma dopo be (She is always late). Never vuol già dire \"non… mai\": I never eat meat, non I don't never.",
     () => {
       const [en, it] = pick(ADV), s = pick(SUBJ_TR);
       if (coin(0.3)) {
@@ -381,7 +381,7 @@
     });
 
   add('a1-05', 'be-no-do', 'Due eccezioni importanti', 'Be non usa do; domande sul soggetto',
-    'Due eccezioni: il verbo be non usa mai do (Are you tired?, non Do you are tired?). E quando la domanda è sul soggetto (Who…?) non serve do: Who lives here? (chi abita qui?).',
+    "Be non chiede mai aiuto a do: Are you tired?, non Do you are tired? E quando chiedi \"chi?\" non serve do: Who lives here? (chi abita qui?).",
     () => {
       const m = pick(['be', 'be', 'who']);
       if (m === 'who') {
@@ -411,7 +411,7 @@
   // parole utili: la cosa (senza un / due / del…) e il luogo; there is / are resta da fare
   const thereGl = (nit, n, plit, pl) => gloss([[nit.replace(/^(una|un|due|tre|cinque|della|delle|dei|degli|del|tanta) /, ''), n.replace(/^(a lot of|an|a|two|three|five|some) /, '')], [plit, pl]]);
   add('a1-06', 'there-is-are', ['There is / there are', 'There is o it is?'], 'There is / there are',
-    '"C\'è" è there is (singolare e non numerabili: there\'s a bank, there\'s some milk); "ci sono" è there are (plurale: there are two chairs). Domande: Is there…? Are there…? Il verbo avere non c\'entra: There\'s a park in my town (non My town has / In my town has).',
+    "C'è = there is (there's a bank, there's some milk); ci sono = there are (there are two chairs). Domande: Is there…? Are there…? Il verbo avere non c'entra: There's a park in my town.",
     () => {
       const [n, nit, sing, ...places] = pick(THERE), [pl, plit] = pick(places), be = sing ? 'is' : 'are';
       const why = `${n} è ${sing ? 'singolare (o non numerabile)' : 'plurale'}: there ${b(be)}.`;
@@ -428,7 +428,7 @@
   const SOME_N = [['eggs', 'uova', 0], ['apples', 'mele', 0], ['biscuits', 'biscotti', 0], ['chairs', 'sedie', 0], ['questions', 'domande', 0], ['milk', 'latte', 1], ['sugar', 'zucchero', 1], ['bread', 'pane', 1], ['water', 'acqua', 1], ['cheese', 'formaggio', 1]];
   const itPart = (it, m, f) => m ? (/^[aeiou]/.test(it) ? `dell'${it}` : `del ${it}`) : f ? `delle ${it}` : `degli ${it}`;
   add('a1-06', 'some-any', 'Some e any', 'Some e any',
-    'Some (dei, un po\' di) nelle frasi affermative e nelle offerte; any nelle frasi negative e nelle domande. There are some eggs / There aren\'t any eggs / Are there any eggs? No = not any: There are no eggs.',
+    "Some (dei, un po' di) nelle frasi normali e quando offri qualcosa; any quando c'è un \"non\" o una domanda: There are some eggs / There aren't any eggs / Are there any eggs? There are no eggs = there aren't any.",
     () => {
       const [n, nit, unc] = pick(SOME_N), be = unc ? 'is' : 'are', fem = ['uova', 'mele', 'sedie', 'domande'].includes(nit);
       const m = pick(['aff', 'neg', 'q', 'trneg', 'trq', 'fix']);
@@ -459,7 +459,7 @@
     ['They live ___ Italy.', 'in', 'Vivono in Italia.', 'Con i paesi: in.', [['vivere', 'live'], ['Italia', 'Italy']]],
     ['The car is ___ the house.', 'behind', 'La macchina è dietro la casa.', 'Behind = dietro.', [['macchina', 'car'], ['casa', 'house']]]];
   add('a1-06', 'prepositions', 'Preposizioni di luogo', 'Preposizioni di luogo: in, on, at…',
-    'In = dentro e con città e paesi (in the box, in Rome). On = sopra, su una superficie e i piani (on the table, on the second floor). At = un punto preciso ed espressioni fisse (at the station, at home, at work). Next to vuole sempre to.',
+    "In = dentro, e con città e paesi (in the box, in Rome). On = appoggiato sopra, e i piani (on the table, on the second floor). At = un punto preciso e le espressioni fisse (at the station, at home, at work). Next to vuole sempre to.",
     () => {
       const [q, a, it, why, words5] = pick(PREP);
       if (coin(0.4)) return F.tr(it, [q.replace('___', a)], { why, gl: gloss(words5 || []) });

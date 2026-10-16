@@ -25,6 +25,8 @@ window.T = (head, rows, cls = '') =>
   `<div class="tw"><table class="tbl ${cls}"><thead><tr>${head.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
 // Nota a margine
 window.N = html => `<aside class="note">${html}</aside>`;
+// Trucco per ricordare: una frase breve, un'immagine, una filastrocca
+window.TIP = html => `<aside class="tip"><span class="tip-h">Per ricordarlo</span>${html}</aside>`;
 // Errori tipici: ERR(["sbagliato","giusto","perché"], ...)
 window.ERR = (...items) =>
   `<ul class="errs">${items.map(([w, r, why]) => `<li><span class="wrong">${w}</span><span class="arrow">→</span><span class="right">${r}</span>${why ? `<span class="why">${why}</span>` : ''}</li>`).join('')}</ul>`;

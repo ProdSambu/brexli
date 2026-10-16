@@ -2,28 +2,32 @@ UNIT({
   id: 'a1-10', n: 10, level: 'A1', stop: 'Past simple',
   title: 'Past simple: regolari e irregolari',
   sub: '-ed e la sua pronuncia, i verbi irregolari, did e didn\'t',
-  intro: "È il tempo del racconto: cosa hai fatto ieri, dove sei andato in vacanza. Si forma in modo semplice, ma i verbi più usati sono proprio quelli irregolari.",
+  intro: "È il tempo per raccontare: cosa hai fatto ieri, dove sei andato in vacanza. È anche facile, perché è <b>uguale per tutte le persone</b>. L'unica fatica sono i verbi irregolari, che sono proprio i più usati.",
   theory: [
     { h: 'Quando si usa', b: `
-      <p>Per azioni <b>concluse</b> in un momento <b>definito</b> del passato (detto o sottinteso). Traduce sia il passato prossimo che il passato remoto.</p>
+      <p>Per una cosa <b>finita</b>, successa in un momento <b>preciso</b> del passato: ieri, l'anno scorso, due giorni fa. Traduce sia "ho visto" sia "vidi".</p>
       ${EX(['I <b>saw</b> Marco yesterday.', 'Ieri ho visto Marco.'], ['We <b>went</b> to Paris in 2019.', 'Nel 2019 siamo andati a Parigi.'], ['She <b>called</b> me an hour ago.', "Mi ha chiamato un'ora fa."])}
-      ${N("<p>Con un tempo concluso (yesterday, last week, in 2019, ago) <b>non si usa mai il present perfect</b>: <i>I have seen him yesterday</i> è sbagliato. Il calco dal passato prossimo italiano è l'errore più frequente.</p>")}` },
+      ${N("<p>In italiano diciamo \"<b>ho</b> visto\", ma in inglese con <i>yesterday, last week, ago</i> non si usa <i>have</i>: si dice <i>I saw him yesterday</i>, non <i>I have seen him yesterday</i>. È l'errore più comune.</p>")}
+      ${TIP(`<p>Se nella frase c'è un <b>quando</b> già finito (ieri, la settimana scorsa, nel 2019, tre giorni fa), usa il past simple. Il "quando" chiude la porta del passato.</p>`)}` },
     { h: 'Verbi regolari: -ed', b: `
-      <p>La forma è uguale per tutte le persone.</p>
+      <p>Ai verbi regolari si aggiunge <b>-ed</b>, ed è uguale per tutti: <i>I worked, she worked, they worked</i>. Qualche verbo cambia un po' quando si scrive:</p>
       ${T(['Il verbo finisce in…', 'Regola', 'Esempi'], [['-e', '+ d', 'live → lived, arrive → arrived'], ['consonante + y', 'y → ied', 'study → studied, try → tried (ma play → played)'], ['consonante-vocale-consonante accentata', 'raddoppio + ed', 'stop → stopped, plan → planned, prefer → preferred'], ['-l (britannico)', 'raddoppio + ed', 'travel → travelled'], ['tutti gli altri', '+ ed', 'work → worked, want → wanted']], 'plain')}
       <h3>Come si pronuncia -ed</h3>
+      <p>La <i>e</i> di <i>-ed</i> di solito <b>non si sente</b>: <i>worked</i> si dice "uòrkt", tutto in un colpo. Si sente solo dopo <b>t</b> e <b>d</b>: <i>wanted</i> = "uòn-tid".</p>
       ${T(['Suono', 'Quando', 'Esempi'], [['/t/', 'dopo suoni sordi: p, k, s, sh, ch, f', 'worked, stopped, watched, washed'], ['/d/', 'dopo suoni sonori e vocali', 'played, lived, called, opened'], ['/ɪd/', 'solo dopo t e d', 'wanted, needed, visited, decided']], 'plain')}
       ${EX(['worked', ''], ['played', ''], ['wanted', ''])}
-      ${N('<p>La sillaba in più /ɪd/ si sente <b>solo</b> dopo t e d. <i>Worked</i> è una sillaba sola: "uorkt", non "uorked".</p>')}` },
+      ${TIP(`<p>Le regole di scrittura sono le stesse dell'<b>-ing</b> e della <b>-s</b>: la <b>y</b> dopo una consonante cambia (stud<b>ied</b>), e il "panino" consonante-vocale-consonante raddoppia (sto<b>pp</b>ed). Le hai già viste: le stai solo riusando.</p>`)}` },
     { h: 'Verbi irregolari', b: `
-      <p>Molti verbi comuni hanno un past simple proprio, da imparare a memoria. Questi sono i più frequenti:</p>
+      <p>Molti verbi, proprio quelli che usi di più, al passato cambiano del tutto. Vanno imparati a memoria. Questi sono i più comuni:</p>
       ${T(['Base', 'Past simple', 'Base', 'Past simple'], [['be', 'was / were', 'go', 'went'], ['have', 'had', 'get', 'got'], ['do', 'did', 'make', 'made'], ['say', 'said', 'see', 'saw'], ['come', 'came', 'take', 'took'], ['know', 'knew', 'think', 'thought'], ['buy', 'bought', 'eat', 'ate'], ['give', 'gave', 'find', 'found'], ['tell', 'told', 'leave', 'left']], 'plain')}
-      <p>L'elenco completo, con l'allenamento, è nella pagina <a href="#/irregolari">Verbi irregolari</a>.</p>` },
+      <p>L'elenco completo, con l'allenamento, è nella pagina <a href="#/irregolari">Verbi irregolari</a>.</p>
+      ${TIP(`<p>Imparali <b>a gruppi che suonano uguali</b>, è molto più facile:</p><ul><li>buy → <b>bought</b>, think → <b>thought</b>, bring → <b>brought</b> (tutti in <i>-ought</i>);</li><li>know → <b>knew</b>, grow → <b>grew</b>, throw → <b>threw</b> (tutti in <i>-ew</i>);</li><li>come → <b>came</b>, give → <b>gave</b>, take → <b>took</b> (cambia solo la vocale).</li></ul><p>Bastano cinque minuti al giorno nella pagina dei verbi irregolari.</p>`)}` },
     { h: 'Negativa e domande: did', b: `
-      <p>Come al presente con do, ma l'ausiliare è <b>did</b> per tutte le persone. Dopo did il verbo torna alla <b>forma base</b>: il passato lo porta già l'ausiliare.</p>
+      <p>Funziona come al presente con <i>do</i>, ma l'aiutante è <b>did</b>, uguale per tutti. Dopo <i>did</i> il verbo torna <b>com'era</b> (<i>go, see, work</i>), perché il passato lo porta già <i>did</i>.</p>
       ${T(['Affermativa', 'Negativa', 'Domanda'], [['I worked', "I didn't work", 'Did you work?'], ['she went', "she didn't go", 'Did she go?'], ['they saw', "they didn't see", 'What did they see?']], 'plain')}
       ${EX(["We <b>didn't go</b> out last night.", 'Ieri sera non siamo usciti.'], ['<b>Did</b> you <b>enjoy</b> the film? — Yes, I <b>did</b>.', 'Ti è piaciuto il film? — Sì.'], ['What <b>did</b> you <b>do</b> at the weekend?', 'Cosa hai fatto nel fine settimana?'])}
-      <p>Le eccezioni sono le stesse del presente: <b>be</b> non usa did (<i>Were you tired?</i>), e le domande sul soggetto nemmeno (<i>Who <b>called</b> you?</i>).</p>` },
+      <p>Le eccezioni sono le stesse del presente: <b>be</b> non usa <i>did</i> (<i>Were you tired?</i>), e quando chiedi "chi?" nemmeno (<i>Who <b>called</b> you?</i>).</p>
+      ${TIP(`<p><b>Il passato si dice una volta sola.</b> Se c'è già <i>did</i>, il verbo dopo non va al passato: <i>didn't <b>go</b></i>, mai <i>didn't went</i>. È la stessa regola della -s con <i>does</i>.</p>`)}` },
     { h: 'Errori tipici', b: ERR(
       ["I didn't went to school.", "I didn't go to school.", 'Dopo didn\'t: forma base.'],
       ['Did you saw that?', 'Did you see that?', 'Dopo did: forma base.'],

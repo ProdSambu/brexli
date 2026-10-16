@@ -2,22 +2,28 @@ UNIT({
   id: 'a2-06', n: 6, level: 'A2', stop: 'Much e many',
   title: '<i>Much</i>, <i>many</i>, <i>a lot of</i>, <i>a few</i>, <i>a little</i>',
   sub: 'Nomi numerabili e non numerabili, le quantità',
-  intro: "\"Molto\" e \"poco\" in inglese cambiano a seconda che la cosa si possa contare o no. E alcune parole che in italiano si contano (informazioni, consigli, mobili) in inglese non si contano affatto.",
+  intro: "\"Molto\" e \"poco\" in inglese cambiano a seconda che la cosa <b>si possa contare o no</b>. E attenzione: alcune cose che in italiano contiamo (informazioni, consigli, mobili) in inglese non si contano affatto.",
   theory: [
     { h: 'Numerabili e non numerabili', b: `
-      <p>I nomi <b>numerabili</b> hanno il plurale e si possono contare: <i>a chair, two chairs</i>. I <b>non numerabili</b> non hanno plurale e non vogliono <i>a / an</i>: <i>water, money, music</i>.</p>
-      <p>Alcuni sono non numerabili in inglese ma numerabili in italiano. Sono singolari e non prendono mai la -s:</p>
+      <p>Ci sono cose che puoi <b>contare</b> (una sedia, due sedie: <i>a chair, two chairs</i>) e cose che <b>non puoi contare</b> (l'acqua, i soldi, la musica: <i>water, money, music</i>). Queste ultime non hanno il plurale e non vogliono <i>a / an</i>.</p>
+      <p>Alcune parole in italiano si contano, in inglese no. Restano al singolare e non prendono mai la -s:</p>
       ${T(['Inglese', 'Italiano'], [['information', 'informazioni'], ['advice', 'consigli'], ['news', 'notizie'], ['furniture', 'mobili'], ['luggage · baggage', 'bagagli'], ['homework', 'compiti'], ['hair', 'capelli'], ['bread', 'pane'], ['work', 'lavoro'], ['traffic · weather', 'traffico · tempo atmosferico']], 'plain')}
       ${EX(['Can you give me some <b>information</b>?', 'Mi puoi dare delle informazioni?'], ['Her <b>hair</b> is very long.', 'Ha i capelli lunghissimi.'], ['That\'s a good <b>piece of advice</b>.', 'È un buon consiglio.'])}
-      ${N('<p>Per contarli si usa un\'unità: <i>a piece of advice, a piece of furniture, a slice of bread, a bottle of water</i>.</p>')}` },
+      ${N('<p>Per contarle si usa un "contenitore": <i>a piece of advice</i> (un consiglio), <i>a piece of furniture</i> (un mobile), <i>a slice of bread</i> (una fetta di pane), <i>a bottle of water</i> (una bottiglia d\'acqua).</p>')}
+      ${TIP(`<p>Fai la prova del <b>numero</b>: puoi dire "<i>three …s</i>"? <i>Three chairs</i> sì → si conta. <i>Three waters, three informations</i> no → non si conta.</p><p>Le cose che non si contano sono come <b>liquidi o mucchi</b>: acqua, pane, soldi, tempo, informazione. Ne puoi avere tanta o poca, ma non "tre".</p>`)}` },
     { h: 'Much, many, a lot of', b: `
+      <p>Tutte e tre vogliono dire <b>"molto, tanti"</b>. Scegli così:</p>
+      <ul><li><b>many</b> con le cose che si contano (<i>many people, many cars</i>);</li><li><b>much</b> con le cose che non si contano (<i>much time, much money</i>);</li><li><b>a lot of</b> va bene con tutte e due, ed è quella giusta nelle frasi normali.</li></ul>
       ${T(['', 'Con', 'Dove si usa', 'Esempio'], [['many', 'numerabili plurali', 'soprattutto negative e domande', "There aren't many people."], ['much', 'non numerabili', 'soprattutto negative e domande', "I don't have much time."], ['a lot of · lots of', 'tutti e due', 'soprattutto affermative', 'She has a lot of friends. · We drank lots of water.']], 'plain')}
-      <p>Le domande sulla quantità: <b>How many</b> + plurale, <b>How much</b> + non numerabile (e per i prezzi: <i>How much is it?</i>).</p>
+      <p>Per chiedere "<b>quanto / quanti?</b>": <b>How many</b> + cose che si contano, <b>How much</b> + cose che non si contano. Anche per chiedere un prezzo: <i>How much is it?</i> (quanto costa?).</p>
       ${EX(['How <b>many</b> brothers have you got?', 'Quanti fratelli hai?'], ['How <b>much</b> money do you need?', 'Quanti soldi ti servono?'])}
-      ${N("<p>Nelle frasi affermative <i>much</i> suona formale o strano: <i>I have much money</i> non si dice. Si usa <b>a lot of</b>.</p>")}` },
+      ${N("<p>Nelle frasi normali <i>much</i> suona strano: <i>I have much money</i> non si dice. Si dice <i>I have <b>a lot of</b> money</i>.</p>")}
+      ${TIP(`<p><b>Many</b> = <b>m</b>olti <b>n</b>umeri: cose che si contano. <b>Much</b> = un <b>m</b>ucchio: cose che non si contano.</p><p>Nel dubbio, nelle frasi affermative usa <b>a lot of</b>: va bene sempre.</p>`)}` },
     { h: 'A few, a little, few, little', b: `
+      <p>Per dire "<b>un po'</b>" o "<b>qualche</b>" si usa <b>a few</b> con le cose che si contano e <b>a little</b> con quelle che non si contano. Senza la <i>a</i> il senso cambia: diventa "<b>troppo poco</b>".</p>
       ${T(['', 'Con', 'Senso', 'Esempio'], [['a few', 'numerabili', 'qualche, alcuni (abbastanza)', 'I have a few friends in London.'], ['a little', 'non numerabili', 'un po\' (abbastanza)', 'Can I have a little milk?'], ['few', 'numerabili', 'pochi (troppo pochi)', 'Few people came. (peccato)'], ['little', 'non numerabili', 'poco (troppo poco)', 'We have little time. (dobbiamo sbrigarci)']], 'plain')}
-      <p>Con <b>too</b>: <i>too many cars, too much noise</i> (troppe macchine, troppo rumore). Con <b>enough</b>: <i>enough chairs, enough time</i> (abbastanza).</p>` },
+      <p>"Troppo" si dice <b>too</b>: <i>too many cars, too much noise</i> (troppe macchine, troppo rumore). "Abbastanza" si dice <b>enough</b>: <i>enough chairs, enough time</i>.</p>
+      ${TIP(`<p>La <b>a</b> è un regalino: <i><b>a</b> few friends</i> = qualche amico, che bello. Senza la <i>a</i> il regalo sparisce: <i>few friends</i> = pochi amici, che peccato.</p><p><b>Few</b> va con <i>many</i> (cose da contare), <b>little</b> va con <i>much</i> (mucchi).</p>`)}` },
     { h: 'Errori tipici', b: ERR(
       ['There are much people.', 'There are a lot of people.', 'People è numerabile: many o a lot of.'],
       ['I need some informations.', 'I need some information.', 'Information non ha plurale.'],

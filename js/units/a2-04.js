@@ -2,23 +2,28 @@ UNIT({
   id: 'a2-04', n: 4, level: 'A2', stop: 'Perfect o past?',
   title: 'Present perfect o past simple?',
   sub: 'La domanda da farsi: il tempo è finito?',
-  intro: "Il passato prossimo italiano si traduce a volte con il present perfect, a volte con il past simple. La regola per scegliere è una sola, e conviene farla diventare un riflesso.",
+  intro: "Il nostro \"ho fatto\" in inglese a volte è present perfect (<i>I've done</i>), a volte past simple (<i>I did</i>). Per scegliere basta <b>una domanda sola</b>: vale la pena ripetersela finché diventa automatica.",
   theory: [
     { h: 'La domanda da farsi', b: `
-      <p>Prima di scegliere il tempo, chiediti: <b>sto parlando di un momento o di un periodo che è finito?</b></p>
+      <p>Prima di scegliere, chiediti: <b>il tempo di cui parlo è finito?</b></p>
+      <ul><li><b>Sì</b>, è finito (ieri, la settimana scorsa, nel 2019) → <b>past simple</b>: <i>I saw him yesterday</i>.</li><li><b>No</b>, non è finito, oppure non dico quando → <b>present perfect</b>: <i>I've seen him three times this week</i>.</li></ul>
       ${T(['Past simple', 'Present perfect'], [['tempo finito, detto o sottinteso', 'tempo non detto, o periodo non ancora finito'], ['yesterday, last week, in 2019, two days ago, when I was a child', 'ever, never, just, already, yet, so far, for, since'], ['<b>I saw</b> him yesterday.', "<b>I've seen</b> him three times this week."], ['<b>Did</b> you <b>see</b> the match on Sunday?', '<b>Have</b> you <b>seen</b> the match? (non importa quando)']], 'plain')}
-      ${N('<p>Le domande con <b>When...?</b> chiedono un momento preciso, quindi vogliono sempre il past simple: <i>When did you arrive?</i>, mai <i>When have you arrived?</i></p>')}` },
+      ${N('<p>Le domande con <b>When…?</b> (quando?) chiedono un momento preciso, quindi vogliono sempre il past simple: <i>When did you arrive?</i>, mai <i>When have you arrived?</i></p>')}
+      ${TIP(`<p>Pensa a una <b>porta</b>: se il tempo è chiuso (ieri, nel 2019, tre giorni fa) la porta è chiusa → <b>past simple</b>. Se la porta è ancora aperta (oggi, questa settimana, nella vita, mai) → <b>present perfect</b>.</p>`)}` },
     { h: 'Today, this week, this year', b: `
-      <p>Con i periodi che includono il presente si usa il present perfect, perché il periodo non è finito.</p>
+      <p><i>Today</i> (oggi), <i>this week</i> (questa settimana), <i>this year</i> (quest'anno) non sono ancora finiti: ci sei dentro. Per questo vogliono il present perfect.</p>
       ${EX(["I've drunk three coffees <b>today</b>.", 'Oggi ho bevuto tre caffè.'], ["We haven't had a holiday <b>this year</b>.", "Quest'anno non abbiamo fatto vacanze."])}
-      <p><i>This morning</i> dipende da quando parli: alle dieci di mattina <i>I've had two coffees this morning</i>; alle cinque del pomeriggio la mattina è finita, quindi <i>I had two coffees this morning</i>.</p>` },
+      <p><i>This morning</i> (stamattina) dipende da che ora è: alle dieci di mattina dici <i>I've had two coffees this morning</i>; alle cinque del pomeriggio la mattina è finita, quindi <i>I had two coffees this morning</i>.</p>
+      ${TIP(`<p>Guarda l'orologio: <b>sei ancora dentro</b> quel periodo? Allora è present perfect. Ne sei già uscito? Past simple.</p>`)}` },
     { h: 'Come va una conversazione', b: `
-      <p>Di solito si apre con il present perfect (l'esperienza, la notizia) e si prosegue con il past simple (i dettagli: quando, dove, com'era).</p>
-      ${EX(['Have you ever been to Japan?', 'Sei mai stato in Giappone?'], ['Yes, I have. I went there in 2018.', 'Sì. Ci sono andato nel 2018.'], ['Really? Did you like it?', 'Davvero? Ti è piaciuto?'], ['I loved it. The food was amazing.', 'Moltissimo. Il cibo era fantastico.'])}` },
+      <p>Di solito si comincia con il present perfect (la notizia, l'esperienza) e poi si continua con il past simple (i dettagli: quando, dove, com'era).</p>
+      ${EX(['Have you ever been to Japan?', 'Sei mai stato in Giappone?'], ['Yes, I have. I went there in 2018.', 'Sì. Ci sono andato nel 2018.'], ['Really? Did you like it?', 'Davvero? Ti è piaciuto?'], ['I loved it. The food was amazing.', 'Moltissimo. Il cibo era fantastico.'])}
+      ${TIP(`<p>Come un titolo di giornale e il suo articolo: il <b>titolo</b> è present perfect ("<i>I've been to Japan!</i>"), l'<b>articolo</b> con i dettagli è past simple ("<i>I went in 2018, it was amazing</i>").</p>`)}` },
     { h: 'Persone e periodi del passato', b: `
-      <p>Quando la persona non c'è più o il periodo è chiuso, si usa il past simple anche senza una data.</p>
+      <p>Se la persona non c'è più, o se quel periodo della vita è chiuso, si usa il past simple anche senza dire una data.</p>
       ${EX(['Shakespeare <b>wrote</b> 39 plays.', 'Shakespeare ha scritto 39 opere teatrali.'], ['My grandfather <b>worked</b> in a factory.', 'Mio nonno ha lavorato in fabbrica.'])}
-      <p>Confronta: <i>My sister has worked in three countries</i> (lavora ancora, la sua carriera continua).</p>` },
+      <p>Confronta: <i>My sister has worked in three countries</i> (mia sorella lavora ancora: la sua storia continua).</p>
+      ${TIP(`<p>La storia di quella persona può ancora continuare? Sì → present perfect. No, è un capitolo chiuso → past simple.</p>`)}` },
     { h: 'Errori tipici', b: ERR(
       ["I've seen him yesterday.", 'I saw him yesterday.', 'Yesterday è un tempo finito.'],
       ['When have you bought it?', 'When did you buy it?', 'When vuole il past simple.'],

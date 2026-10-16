@@ -2,25 +2,32 @@ UNIT({
   id: 'a1-12', n: 12, level: 'A1', stop: 'Comparativi',
   title: 'Comparativi e superlativi',
   sub: '-er / more, the -est / the most, than, as … as',
-  intro: "Più grande, il più caro, alto come suo padre. Le regole dipendono dalla lunghezza dell'aggettivo, e ci sono tre irregolari che si usano continuamente.",
+  intro: "\"Più grande\", \"il più caro\", \"alto come suo padre\". La regola dipende da una cosa sola: se l'aggettivo è <b>corto</b> o <b>lungo</b>. Poi ci sono tre irregolari che si usano sempre.",
   theory: [
     { h: 'Aggettivi corti: -er e the -est', b: `
-      <p>Gli aggettivi di <b>una sillaba</b> aggiungono <b>-er</b> (comparativo) e <b>the -est</b> (superlativo).</p>
-      ${T(['Aggettivo', 'Comparativo', 'Superlativo', 'Regola'], [['cheap', 'cheaper', 'the cheapest', '+ er / + est'], ['nice', 'nicer', 'the nicest', 'finisce in -e: + r / + st'], ['big', 'bigger', 'the biggest', 'consonante-vocale-consonante: raddoppio'], ['happy', 'happier', 'the happiest', 'anche di due sillabe in -y: y → ier / iest']])}` },
+      <p>Agli aggettivi <b>corti</b> (quelli che si dicono in un colpo solo, come <i>big, cheap, tall</i>) si aggiunge:</p>
+      <ul><li><b>-er</b> per dire "più …": <i>cheap → cheaper</i> (più economico);</li><li><b>the -est</b> per dire "il più …": <i>the cheapest</i> (il più economico).</li></ul>
+      <p>Valgono come corti anche gli aggettivi di due sillabe che finiscono in <b>-y</b>: <i>happy → happier</i>.</p>
+      ${T(['Aggettivo', 'Comparativo', 'Superlativo', 'Regola'], [['cheap', 'cheaper', 'the cheapest', '+ er / + est'], ['nice', 'nicer', 'the nicest', 'finisce in -e: + r / + st'], ['big', 'bigger', 'the biggest', 'consonante-vocale-consonante: raddoppio'], ['happy', 'happier', 'the happiest', 'anche di due sillabe in -y: y → ier / iest']])}
+      ${TIP(`<p>Per sapere se un aggettivo è corto, <b>battilo con le mani</b>: <i>big</i> = un colpo → corto, <i>-er</i>. <i>ex-pen-sive</i> = tre colpi → lungo, <i>more</i>.</p><p>E le regole di scrittura sono sempre le stesse che conosci già: big → bi<b>gg</b>er, happ<b>y</b> → happ<b>ier</b>.</p>`)}` },
     { h: 'Aggettivi lunghi: more e the most', b: `
-      <p>Gli aggettivi di <b>due o più sillabe</b> (tranne quelli in -y) usano <b>more</b> e <b>the most</b>, senza cambiare.</p>
+      <p>Gli aggettivi <b>lunghi</b> (due sillabe o più, tranne quelli in -y) non cambiano: davanti metti <b>more</b> (più) o <b>the most</b> (il più).</p>
       ${T(['Aggettivo', 'Comparativo', 'Superlativo'], [['expensive', 'more expensive', 'the most expensive'], ['interesting', 'more interesting', 'the most interesting'], ['beautiful', 'more beautiful', 'the most beautiful']])}
-      <p>Il contrario è <b>less</b> / <b>the least</b>: <i>less expensive, the least interesting</i>.</p>` },
+      <p>Per dire "meno" si usa <b>less</b> (meno) e <b>the least</b> (il meno): <i>less expensive, the least interesting</i>.</p>
+      ${TIP(`<p><b>O -er o more, mai tutti e due.</b> Una parola lunga è già "pesante": invece di allungarla ancora con -er, le metti <i>more</i> davanti. Quindi <i>taller</i> o <i>more expensive</i>, ma mai <i>more taller</i>.</p>`)}` },
     { h: 'Irregolari', b: `
+      <p>Sono solo tre, ma li userai continuamente:</p>
       ${T(['Aggettivo', 'Comparativo', 'Superlativo'], [['good', 'better', 'the best'], ['bad', 'worse', 'the worst'], ['far', 'further / farther', 'the furthest / farthest']])}
-      ${EX(['Your English is <b>better</b> than mine.', 'Il tuo inglese è migliore del mio.'], ["It's <b>the worst</b> day of my life.", 'È il giorno peggiore della mia vita.'])}` },
+      ${EX(['Your English is <b>better</b> than mine.', 'Il tuo inglese è migliore del mio.'], ["It's <b>the worst</b> day of my life.", 'È il giorno peggiore della mia vita.'])}
+      ${TIP(`<p>Sono irregolari anche in italiano! buono → <b>migliore</b> → il <b>migliore</b>; cattivo → <b>peggiore</b> → il <b>peggiore</b>. Così: good → <b>better</b> → the <b>best</b>; bad → <b>worse</b> → the <b>worst</b>.</p>`)}` },
     { h: 'Than, in, as … as', b: `
-      <p>Il secondo termine di paragone ("di", "che") è <b>than</b>.</p>
+      <p>Il "<b>di</b>" dei paragoni (più alto <b>di</b> me) si dice <b>than</b>.</p>
       ${EX(['A car is faster <b>than</b> a bike.', 'Una macchina è più veloce di una bici.'], ["She's taller <b>than</b> me.", 'È più alta di me.'])}
-      <p>Con il superlativo, "di" si traduce <b>in</b> davanti a luoghi e gruppi, <b>of</b> davanti a periodi di tempo e a gruppi numerici.</p>
+      <p>Con "il più…", il "di" diventa <b>in</b> davanti a un luogo o a un gruppo (del mondo, della squadra) e <b>of</b> davanti a un periodo di tempo (dell'anno, della mia vita).</p>
       ${EX(["It's the tallest building <b>in</b> the world.", 'È il palazzo più alto del mondo.'], ["He's the best player <b>in</b> the team.", 'È il giocatore migliore della squadra.'], ['It was the best day <b>of</b> the year.', "Fu il giorno più bello dell'anno."])}
-      <p>Per l'uguaglianza si usa <b>as + aggettivo + as</b>; al negativo <b>not as ... as</b>.</p>
-      ${EX(["He's <b>as</b> tall <b>as</b> his father.", 'È alto come suo padre.'], ["Rome isn't <b>as</b> big <b>as</b> London.", 'Roma non è grande come Londra.'])}` },
+      <p>Per dire "<b>come</b>" (alto come lui) si usa <b>as … as</b>; per dire "non … come", <b>not as … as</b>.</p>
+      ${EX(["He's <b>as</b> tall <b>as</b> his father.", 'È alto come suo padre.'], ["Rome isn't <b>as</b> big <b>as</b> London.", 'Roma non è grande come Londra.'])}
+      ${TIP(`<p><b>Than</b> e <b>"che"</b> si somigliano: più alto <b>che</b> me → taller <b>than</b> me.</p><p><b>In</b> = dentro un posto o un gruppo (in the world, in the team). <b>Of</b> = un pezzo di tempo (of the year, of my life).</p><p><b>As … as</b> è un panino: l'aggettivo sta in mezzo. <i>as <b>tall</b> as</i>.</p>`)}` },
     { h: 'Errori tipici', b: ERR(
       ['This exercise is more easy.', 'This exercise is easier.', 'Easy finisce in -y: easier.'],
       ['She is more taller than me.', "She's taller than me.", 'O -er o more, mai entrambi.'],

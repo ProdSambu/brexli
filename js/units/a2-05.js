@@ -2,22 +2,25 @@ UNIT({
   id: 'a2-05', n: 5, level: 'A2', stop: 'Past continuous',
   title: 'Past continuous e past simple',
   sub: 'Lo sfondo e l\'azione: when, while, e l\'imperfetto italiano',
-  intro: "Per raccontare serve distinguere lo sfondo (cosa stava succedendo) dall'azione che lo interrompe. È il lavoro del past continuous insieme al past simple.",
+  intro: "Per raccontare bene una storia devi distinguere lo <b>sfondo</b> (cosa stava succedendo) dall'<b>azione</b> che arriva all'improvviso. Lo sfondo è il past continuous, l'azione è il past simple.",
   theory: [
     { h: 'Come si forma', b: `
-      <p><b>was / were</b> + verbo in <b>-ing</b>.</p>
+      <p>È il present continuous portato al passato: al posto di <i>am / is / are</i> metti <b>was / were</b>, poi il verbo in <b>-ing</b>. Corrisponde al nostro "<b>stavo</b> facendo".</p>
       ${T(['Affermativa', 'Negativa', 'Domanda'], [['I / he / she / it was working', "I / he / she / it wasn't working", 'Was she working?'], ['you / we / they were working', "you / we / they weren't working", 'Were they working?']], 'plain')}
-      ${EX(['At eight o\'clock I <b>was having</b> dinner.', 'Alle otto stavo cenando.'], ['What <b>were</b> you <b>doing</b> last night at ten?', 'Cosa stavi facendo ieri sera alle dieci?'])}` },
+      ${EX(['At eight o\'clock I <b>was having</b> dinner.', 'Alle otto stavo cenando.'], ['What <b>were</b> you <b>doing</b> last night at ten?', 'Cosa stavi facendo ieri sera alle dieci?'])}
+      ${TIP(`<p><b>stavo</b> + mangi<b>ando</b> = <b>I was</b> + eat<b>ing</b>. Come "sto mangiando" = <i>I'm eating</i>, solo un passo indietro nel tempo.</p>`)}` },
     { h: 'Azione in corso e azione che la interrompe', b: `
-      <p>Il past continuous descrive un'azione <b>in corso</b> in un momento del passato; il past simple descrive un'azione <b>breve</b> che succede nel mezzo.</p>
+      <p>Il past continuous racconta un'azione <b>lunga</b>, che era in corso; il past simple racconta un'azione <b>breve</b> che succede nel mezzo e la interrompe.</p>
       ${EX(['I <b>was having</b> a shower when the phone <b>rang</b>.', 'Stavo facendo la doccia quando ha squillato il telefono.'], ['While we <b>were walking</b> home, it <b>started</b> to rain.', 'Mentre tornavamo a casa, ha cominciato a piovere.'])}
       ${T(['Parola', 'Di solito con', 'Esempio'], [['when', 'il past simple (l\'azione breve)', '...when the phone rang.'], ['while', 'il past continuous (l\'azione lunga)', 'While I was cooking, ...']], 'plain')}
-      <p>Due azioni lunghe nello stesso momento: tutte e due al past continuous. <i>While I was cooking, he was watching TV.</i></p>
-      <p>Due azioni una dopo l'altra: tutte e due al past simple. <i>When she arrived, we had dinner.</i> (prima è arrivata, poi abbiamo cenato)</p>` },
+      <p>Se due azioni lunghe succedono <b>insieme</b>, vanno tutte e due al past continuous: <i>While I was cooking, he was watching TV.</i></p>
+      <p>Se due azioni succedono <b>una dopo l'altra</b>, vanno tutte e due al past simple: <i>When she arrived, we had dinner.</i> (prima è arrivata, poi abbiamo cenato)</p>
+      ${TIP(`<p>Pensa a un <b>film</b>: il past continuous è la <b>scena di sfondo</b> (stavo facendo la doccia…), il past simple è il <b>colpo di scena</b> (…e squilla il telefono!).</p><p><b>While</b> (mentre) di solito va con la scena lunga, <b>when</b> (quando) con il colpo di scena.</p>`)}` },
     { h: "L'imperfetto italiano non è sempre past continuous", b: `
-      <p>L'imperfetto italiano ha tre usi, e in inglese diventano tre cose diverse:</p>
+      <p>L'imperfetto italiano ("facevo", "ero") si usa per tre cose diverse, e in inglese diventano tre forme diverse:</p>
       ${T(['Italiano', 'Uso', 'Inglese'], [['Stavo / mangiavo quando...', 'azione in corso', 'I was eating when...'], ['Da bambino giocavo a calcio.', 'abitudine passata', 'I played football as a child. (oppure I used to play)'], ['Era stanco. Avevo fame.', 'stato', 'He was tired. I was hungry.']], 'plain')}
-      ${N('<p>Per le <b>abitudini</b> del passato si usa il past simple (o <i>used to</i>, che vediamo nella linea B1), non il past continuous: <i>Every summer we went to the sea</i>, non <i>we were going</i>. E i verbi di stato restano semplici: <i>I knew</i>, mai <i>I was knowing</i>.</p>')}` },
+      ${N('<p>Per le <b>abitudini</b> di una volta si usa il past simple (o <i>used to</i>, che vedrai nella linea B1), non il past continuous: <i>Every summer we went to the sea</i>, non <i>we were going</i>.</p><p>I verbi "invisibili" restano semplici anche qui: <i>I knew</i>, mai <i>I was knowing</i>.</p>')}
+      ${TIP(`<p>Prova a dire la frase italiana con <b>"stavo + -ando"</b>. Se funziona ("stavo mangiando quando…"), è past continuous. Se non funziona ("da bambino <s>stavo giocando</s> a calcio"), è past simple.</p>`)}` },
     { h: 'Errori tipici', b: ERR(
       ['When I was a child I was going to the sea every summer.', 'When I was a child I went to the sea every summer.', 'Abitudine passata: past simple.'],
       ['I was knowing the answer.', 'I knew the answer.', 'Know è un verbo di stato.'],

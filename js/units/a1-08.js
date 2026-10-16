@@ -2,27 +2,33 @@ UNIT({
   id: 'a1-08', n: 8, level: 'A1', stop: 'Can',
   title: '<i>Can</i>, <i>could</i> e l\'imperativo',
   sub: 'Capacità, permesso, richieste; dare istruzioni',
-  intro: "Can traduce sapere, potere e riuscire, tutto in una parola. È il primo verbo modale: si comporta in modo diverso da tutti gli altri verbi.",
+  intro: "<i>Can</i> vuol dire <b>sapere</b> (fare una cosa), <b>potere</b> e <b>riuscire</b>: tre verbi italiani in una parola sola. Ed è molto più facile degli altri verbi, perché non cambia mai.",
   theory: [
     { h: 'Come funziona can', b: `
-      <p>I verbi modali hanno regole proprie: <b>forma uguale per tutte le persone</b> (niente -s), <b>niente do</b> nelle domande e nelle negative, e sono seguiti dal verbo base <b>senza to</b>.</p>
+      <p><i>Can</i> ha tre regole semplici:</p>
+      <ul><li>è <b>uguale per tutti</b>: <i>I can, she can, they can</i> (niente -s);</li><li>dopo c'è il verbo <b>senza to</b>: <i>I can swim</i>;</li><li>non usa mai <b>do</b>: la domanda è <i>Can you…?</i>, la negativa è <i>can't</i>.</li></ul>
       ${T(['Affermativa', 'Negativa', 'Domanda', 'Risposta breve'], [['I can swim', "I can't / cannot swim", 'Can I swim?', 'Yes, I can.'], ['she can swim', "she can't swim", 'Can she swim?', "No, she can't."]], 'plain')}
-      ${N("<p>La negativa piena si scrive attaccata: <b>cannot</b>. Pronuncia britannica: <i>can't</i> /kɑːnt/, con la a lunga; <i>can</i> nella frase si pronuncia debole /kən/.</p>")}` },
+      ${N("<p>La negativa per intero si scrive tutta attaccata: <b>cannot</b>.</p>")}
+      ${TIP(`<p><i>Can</i> è un verbo <b>pigro</b>: non prende la -s, non vuole il <i>to</i> e non chiede aiuto a <i>do</i>. Lo lasci sempre così com'è.</p><p>Domanda e negativa funzionano come con <i>be</i>: <i>you can</i> → <i>Can you?</i> → <i>you can't</i>.</p>`)}` },
     { h: 'I significati di can', b: `
+      <p>In italiano usiamo tre verbi diversi, in inglese basta <i>can</i>:</p>
       ${T(['Significato', 'Esempio', 'Italiano'], [['capacità', 'She can speak four languages.', 'Sa parlare quattro lingue.'], ['possibilità', "I can't sleep.", 'Non riesco a dormire.'], ['permesso', 'Can I open the window?', 'Posso aprire la finestra?'], ['richiesta', 'Can you help me?', 'Mi aiuti?']], 'plain')}
-      <p>Con i verbi di percezione (see, hear, smell) l'inglese mette <i>can</i> dove l'italiano non mette niente:</p>
-      ${EX(["I <b>can't</b> see anything.", 'Non vedo niente.'], ['<b>Can</b> you hear me?', 'Mi senti?'])}` },
+      <p>Con <i>see</i> (vedere) e <i>hear</i> (sentire) l'inglese mette <i>can</i> anche quando in italiano non c'è:</p>
+      ${EX(["I <b>can't</b> see anything.", 'Non vedo niente.'], ['<b>Can</b> you hear me?', 'Mi senti?'])}
+      ${TIP(`<p>Se in italiano c'è <b>so</b>, <b>posso</b> o <b>riesco a</b> seguito da un verbo, in inglese è quasi sempre <b>can</b>: <i>so nuotare, posso entrare, riesco a vedere</i> → <i>I can swim, Can I come in, I can see</i>.</p>`)}` },
     { h: 'Could', b: `
-      <p><b>Could</b> è il passato di can per la capacità, ed è anche la forma più cortese per chiedere.</p>
-      ${EX(['When I was five I <b>could</b> read.', 'A cinque anni sapevo leggere.'], ['<b>Could</b> you close the door, please?', 'Potrebbe chiudere la porta, per favore?'], ["I <b>couldn't</b> find my keys.", 'Non riuscivo a trovare le chiavi.'])}` },
+      <p><b>Could</b> ha due usi: è il <b>passato</b> di can (<i>sapevo, potevo, riuscivo</i>) ed è il modo più <b>gentile</b> per chiedere qualcosa (<i>potresti…?</i>).</p>
+      ${EX(['When I was five I <b>could</b> read.', 'A cinque anni sapevo leggere.'], ['<b>Could</b> you close the door, please?', 'Potrebbe chiudere la porta, per favore?'], ["I <b>couldn't</b> find my keys.", 'Non riuscivo a trovare le chiavi.'])}
+      ${TIP(`<p><i>Can you…?</i> = puoi…? <b>Could you…?</b> = potresti…? Con chi non conosci, usa <i>could</i>: è come passare dal "tu" al "Lei".</p>`)}` },
     { h: "L'imperativo", b: `
-      <p>Per dare istruzioni, ordini o consigli si usa il <b>verbo base</b>, senza soggetto. È uguale per tu e voi.</p>
+      <p>Per dire a qualcuno di fare una cosa si usa il <b>verbo da solo</b>, senza <i>you</i> davanti. Vale sia per "tu" sia per "voi".</p>
       ${EX(['Open the window.', 'Apri / aprite la finestra.'], ['Sit down, please.', 'Siediti, per favore.'])}
-      <p>La negativa è <b>don't</b> + verbo base, anche con be:</p>
+      <p>Per dire di <b>non</b> farla, metti <b>don't</b> davanti (anche con <i>be</i>):</p>
       ${EX(["<b>Don't</b> touch it!", 'Non toccarlo!'], ["<b>Don't be</b> late.", 'Non fare tardi.'])}
-      <p>Per proporre di fare qualcosa insieme: <b>let's</b> + verbo base.</p>
+      <p>Per proporre di fare una cosa insieme ("andiamo!", "mangiamo!") metti <b>let's</b> davanti:</p>
       ${EX(["<b>Let's</b> go!", 'Andiamo!'], ["<b>Let's</b> not argue.", 'Non litighiamo.'])}
-      ${N("<p>L'imperativo da solo può suonare brusco. Con persone che non conosci è meglio <i>Could you...?</i> oppure aggiungere <i>please</i>.</p>")}` },
+      ${N("<p>L'imperativo da solo può sembrare un ordine secco. Con le persone che non conosci aggiungi <i>please</i> o usa <i>Could you…?</i></p>")}
+      ${TIP(`<p>Tre forme, tre parole:</p><ul><li>fai! → <b>verbo</b> (<i>Open!</i>)</li><li>non fare! → <b>don't</b> + verbo (<i>Don't open!</i>)</li><li>facciamo! → <b>let's</b> + verbo (<i>Let's open!</i>)</li></ul>`)}` },
     { h: 'Errori tipici', b: ERR(
       ['Do you can swim?', 'Can you swim?', 'I modali non usano do.'],
       ['He cans cook.', 'He can cook.', 'Niente -s alla terza persona.'],

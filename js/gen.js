@@ -19,7 +19,7 @@
     return spellingHint(w, v.pp1);
   }
   add('a2-01', 'perfect', ['Come si forma', 'Le esperienze: quando non importa', 'Ever e never'], 'Present perfect: have / has + participio',
-    'Il present perfect si forma con have / has + participio passato (terza colonna): I\'ve seen, she has eaten. Si usa per le esperienze senza dire quando (Have you ever been to London?). Never va tra have e il participio.',
+    "Present perfect = have / has + participio (la terza colonna: seen, eaten, been), come \"ho visto\". Si usa per le esperienze della vita quando non dici quando: Have you ever been to London? I've never seen it. Never va tra have e il participio.",
     () => {
       const s = pick(SUBJ), a = pick(ACT), v = a.v, h = haveOf(s), sh = h === 'has' ? "'s" : "'ve", m = pick(['f', 'q', 'never', 'x']);
       const why = `Present perfect: ${h} + participio, ${b(v.pp1)}.`;
@@ -31,7 +31,7 @@
     });
 
   add('a2-02', 'just-yet', 'Just, already, yet', 'Just, already, yet',
-    'Just (appena) e already (già) vanno tra have e il participio: I\'ve just finished, she\'s already left. Yet (ancora / già) va in fondo, nelle negative e nelle domande: I haven\'t eaten yet, Have you finished yet?',
+    "Just (appena) e already (già) stanno in mezzo, tra have e il participio: I've just finished, she's already left. Yet (ancora / già) va in fondo, solo con not e nelle domande: I haven't eaten yet, Have you finished yet?",
     () => {
       const s = pick(SUBJ), a = pick(ACT), v = a.v, h = haveOf(s), m = pick(['yet', 'just', 'already', 'fix']);
       if (m === 'yet') return F.choice(`${enSubj(s, 1)} ${h}n't ${v.pp1} ${a.rest} ___.`, ['yet', 'already', 'just'], 'yet', { why: 'Nelle negative "non ancora" è not … yet, con yet in fondo.' });
@@ -45,7 +45,7 @@
   const SINCE = ['2019', 'Monday', 'Christmas', 'last summer', "nine o'clock", 'I was a child', 'January'];
   const STATES = [["I've lived here", 'I moved here'], ["We've known each other", 'We met'], ["She's worked in this shop", 'She started in this shop'], ["They've been married", 'They got married'], ["I've had this car", 'I bought this car']];
   add('a2-03', 'for-since', ['For o since?', 'For, since e ago', 'Una situazione che dura fino a oggi'], 'For, since e ago',
-    'Per una situazione che dura fino a oggi si usa il present perfect: I\'ve lived here for three years (vivo qui da tre anni). For + una durata (for two years), since + il punto di partenza (since 2019). Ago (fa) va con il past simple: I moved here two years ago.',
+    "\"Da\" + tempo, per una cosa che dura ancora → present perfect: I've lived here for three years (vivo qui da tre anni). For + quanto tempo (for two years), since + da quando (since 2019). Ago (fa) va col past simple: I moved here two years ago.",
     () => {
       const [pp, ps] = pick(STATES), m = pick(['for', 'since', 'ago']);
       if (m === 'for') { const d = pick(FOR); return F.choice(`${pp} ___ ${d}.`, ['for', 'since', 'ago'], 'for', { why: `«${d}» è una durata: ${b('for')}.` }); }
@@ -57,7 +57,7 @@
   const DONE_T = ['yesterday', 'last week', 'in 2018', 'two days ago', 'last summer'];
   const OPEN_T = ['three times this year', 'before', 'many times', 'this week', 'so far this month'];
   add('a2-04', 'perf-or-past', ['La domanda da farsi', 'Today, this week, this year'], 'Present perfect o past simple?',
-    'Chiediti se il tempo è finito. Past simple con un momento finito (yesterday, last week, in 2018, two days ago) e con When…? Present perfect quando il periodo non è finito o non si dice quando (before, this week, three times this year, ever, never).',
+    "Chiediti: il tempo è finito? Sì (yesterday, last week, in 2018, two days ago, When…?) → past simple. No, oppure non dici quando (today, this week, ever, never, before) → present perfect.",
     () => {
       const s = pick(SUBJ), a = pick(ACT), h = haveOf(s), done = coin(), t = done ? pick(DONE_T) : pick(OPEN_T);
       const ps = a.v.p1, pp = `${h} ${a.v.pp1}`;
@@ -67,7 +67,7 @@
   /* ---------- A2-05: past continuous ---------- */
   const INTERRUPT = ['when the phone rang', 'when I arrived', 'when the lights went out', 'when it started to rain'];
   add('a2-05', 'past-cont', ['Come si forma', 'Azione in corso e azione che la interrompe'], 'Past continuous: was / were + -ing',
-    'Past continuous: was / were + -ing, per un\'azione in corso nel passato. Spesso viene interrotta da un\'azione breve al past simple: I was having a shower when the phone rang. When + l\'azione breve, while + quella lunga.',
+    "Was / were + -ing = \"stavo facendo\": un'azione lunga, in corso nel passato. Spesso arriva un'azione breve al past simple a interromperla: I was having a shower when the phone rang. While va con l'azione lunga, when con quella breve.",
     () => {
       const s = pick(SUBJ), a = pick(ACT), v = a.v, w = WAS[s.p], m = pick(['f', 'neg', 'c']);
       const why = `Azione in corso interrotta: ${s.en} ${b(w + ' ' + v.ing)} (l'azione breve al past simple).`;
@@ -86,7 +86,7 @@
   const COUNT = ['friends', 'books', 'brothers', 'languages', 'people', 'questions', 'chairs', 'eggs'];
   const UNCOUNT = ['money', 'time', 'sugar', 'water', 'information', 'homework', 'bread', 'milk', 'advice'];
   add('a2-06', 'much-many', ['Much, many, a lot of', 'A few, a little, few, little', 'Numerabili e non numerabili'], 'Much, many, a few, a little',
-    'Many con le cose che si contano (many friends), much con quelle che non si contano (much time), soprattutto in negative e domande; a lot of va bene con tutte e due. A few + numerabili, a little + non numerabili. Information, advice, news, furniture non si contano.',
+    "Many con le cose che si contano (many friends), much con quelle che non si contano (much time), soprattutto con not e nelle domande. A lot of va bene sempre. A few + cose da contare, a little + cose che non si contano. Information, advice, news, furniture non si contano.",
     () => {
       const c = coin(), n = c ? pick(COUNT) : pick(UNCOUNT), m = pick(['how', 'neg', 'few']);
       const why = c ? `${b(n)} si conta: many.` : `${b(n)} non si conta: much.`;
@@ -104,7 +104,7 @@
     ['Yesterday I ___ work until ten.', 'had to', 'Obbligo al passato: had to.'], ['Nurses ___ wear a uniform at work.', 'have to', 'Obbligo esterno: have to.'],
     ['My sister ___ wear a uniform at school.', 'has to', 'Obbligo esterno, terza persona: has to.'], ['Passengers ___ show their tickets.', 'must', 'Regola scritta: must.']];
   add('a2-07', 'must', ['Must e have to', "Mustn't o don't have to? La trappola", 'Should: il consiglio'], "Must, have to, mustn't, should",
-    "Must e have to = dovere (must per obblighi sentiti o regole scritte, have to per obblighi esterni). La trappola: mustn't = è vietato; don't have to = non è necessario. Should = dovresti (consiglio). Al passato: had to.",
+    "Must e have to = devo (must se lo decido io, have to se me lo impongono). Attenzione: mustn't = è vietato; don't have to = non serve. Should = dovresti, un consiglio. Al passato: had to.",
     () => { const [q, a, why] = pick(MUST); return F.choice(q, [a, ...shuffle(["mustn't", "don't have to", 'should', 'had to', 'has to', 'must'].filter(x => x !== a)).slice(0, 2)], a, { why }); });
 
   /* ---------- A2-08: something / anything ---------- */
@@ -114,13 +114,13 @@
     ["___ knows the answer. It's too difficult.", ['Nobody', 'Anybody', 'Somebody'], 'Nobody', "Nessuno, all'inizio: nobody."], ['Everybody ___ ready.', ['is', 'are'], 'is', 'Everybody è singolare.'],
     ["I've looked ___ but I can't find it.", ['everywhere', 'anywhere', 'nowhere'], 'everywhere', 'Dappertutto: everywhere.']];
   add('a2-08', 'some-any', ['Quando si usa quale', 'Una negazione sola'], 'Something, anything, nothing…',
-    'Some- nelle frasi affermative e nelle offerte; any- nelle negative e nelle domande; no- con il verbo affermativo (è già negativo). Una sola negazione: I didn\'t see anybody o I saw nobody, mai I didn\'t see nobody. Everybody è singolare.',
+    "Some- nelle frasi normali e quando offri; any- con not e nelle domande; no- da solo è già negativo. Un solo \"no\" per frase: I didn't see anybody oppure I saw nobody, mai I didn't see nobody. Everybody vuole il verbo al singolare (everybody is).",
     () => { const [q, o, a, why] = pick(SOME); return F.choice(q, o, a, { why }); });
 
   /* ---------- A2-09: primo condizionale ---------- */
   const IF_THEN = ['be tired', 'be happy', 'need a break', 'feel better', 'have less free time'];
   add('a2-09', 'if-present', ['La struttura', 'Unless = if not'], 'If + presente, will',
-    'Primo condizionale: if + present simple, will + verbo base. Dopo if non si usa will, anche se si parla del futuro: If it rains, we\'ll stay at home (se pioverà…).',
+    "Per dire cosa succederà se succede qualcosa: if + presente, poi will + verbo. Dopo if non si mette mai will, anche se parli del futuro: If it rains, we'll stay at home (se pioverà, resteremo a casa).",
     () => {
       const s = pick(SUBJ), a = pick(ACT), pres = is3(s) ? a.v.third : a.v.b, then = pick(IF_THEN), pr = s.pr;
       const why = `Dopo if si usa il presente: ${b(pres)}${is3(s) ? ' (con la -s, perché il soggetto è ' + s.en + ')' : ''}.`;
@@ -133,7 +133,7 @@
   const TO_V = ['want', 'need', 'hope', 'plan', 'would like'];
   const PREPS = ["I'm good at", "She's interested in", "We're tired of", 'Thank you for'];
   add('a2-10', 'ing-to', ['Verbi seguiti da -ing', 'Verbi seguiti da to + verbo', 'Dopo una preposizione: sempre -ing'], 'Verbo + -ing o verbo + to',
-    'Alcuni verbi vogliono il secondo verbo in -ing (enjoy, finish, avoid, mind, miss, keep), altri to + verbo (want, need, decide, hope, plan, would like). Dopo una preposizione (at, in, of, for, without…) sempre -ing.',
+    "Alcuni verbi vogliono il secondo verbo in -ing (enjoy, finish, avoid, mind, miss, keep: cose già in corso), altri to + verbo (want, need, decide, hope, plan, would like: cose ancora da fare). Dopo at, in, of, for, without… sempre -ing.",
     () => {
       const a = pick(ACT), m = pick(['ing', 'to', 'prep']);
       if (m === 'prep') return F.fill(`${pick(PREPS)} ___ ${a.rest}.`, [a.v.ing], a.v.b, { why: 'Dopo una preposizione il verbo va in -ing.', diag: x => /^to\b/i.test(x.trim()) || lastWord(x) === a.v.b ? `Dopo una preposizione ci vuole la forma in -ing: ${b(a.v.ing)}.` : null });

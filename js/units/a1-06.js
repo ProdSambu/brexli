@@ -2,24 +2,30 @@ UNIT({
   id: 'a1-06', n: 6, level: 'A1', stop: 'There is',
   title: '<i>There is</i>, <i>there are</i>, <i>some</i> e <i>any</i>',
   sub: 'C\'è / ci sono, quantità indefinite, preposizioni di luogo',
-  intro: "Per dire che qualcosa esiste o si trova da qualche parte, l'inglese ha una struttura fissa. Insieme a some e any e alle preposizioni di luogo, è quello che serve per descrivere un posto.",
+  intro: "Come si dice \"c'è\" e \"ci sono\", come si dice \"dei / delle / un po' di\" (<i>some</i> e <i>any</i>) e come si dice dove si trova una cosa (<i>in, on, at…</i>). Con queste tre cose puoi descrivere qualsiasi posto.",
   theory: [
     { h: 'There is / there are', b: `
+      <p>"C'è" si dice <b>there is</b> (corto: <i>there's</i>), "ci sono" si dice <b>there are</b>. Per la negativa aggiungi <i>not</i>, per la domanda scambi le due parole: <i>is there…?</i></p>
       ${T(['', 'singolare', 'plurale'], [['affermativa', "there is · there's", 'there are'], ['negativa', "there isn't", "there aren't"], ['domanda', 'is there...?', 'are there...?'], ['risposta breve', "Yes, there is. / No, there isn't.", "Yes, there are. / No, there aren't."]])}
       ${EX(["<b>There's</b> a bank near here.", "C'è una banca qui vicino."], ['<b>There are</b> three bedrooms.', 'Ci sono tre camere da letto.'], ['<b>Is there</b> a problem?', "C'è un problema?"], ['How many people <b>are there</b>?', 'Quante persone ci sono?'])}
-      <p>Il verbo concorda con la prima cosa nominata: <i>there <b>is</b> a table and two chairs</i>.</p>` },
+      <p>Se elenchi più cose, conta la prima: <i>there <b>is</b> a table and two chairs</i> (c'è un tavolo e due sedie).</p>
+      ${TIP(`<p>Si traduce parola per parola: <b>there</b> = ci, <b>is</b> = è, <b>are</b> = sono. Quindi <b>c'è = there is</b>, <b>ci sono = there are</b>.</p>`)}` },
     { h: 'There is o it is?', b: `
-      <p><b>There is</b> introduce qualcosa per la prima volta, dice che esiste. <b>It is</b> parla di qualcosa che già conosciamo.</p>
+      <p><b>There is</b> serve a dire che una cosa <b>c'è</b>, quando ne parli per la prima volta. <b>It is</b> serve a dire <b>com'è</b> una cosa di cui hai già parlato.</p>
       ${EX(["There's a cat in the garden. It's black.", "C'è un gatto in giardino. È nero."])}
-      ${N('<p>Attenzione al calco "in my town <i>has</i> a park": il verbo avere qui non c\'entra. Si dice <i>There\'s a park in my town</i>.</p>')}` },
+      ${N('<p>Non tradurre "la mia città <i>ha</i> un parco" pensando ad avere: in inglese si dice <i>There\'s a park in my town</i> (c\'è un parco nella mia città).</p>')}
+      ${TIP(`<p><b>There is</b> = "c'è". <b>It is</b> = "è". Se in italiano dici "c'è", in inglese hai bisogno di <i>there</i>.</p>`)}` },
     { h: 'Some e any', b: `
-      <p>Indicano una quantità non precisata, come "dei, delle, un po' di". Si usano con i nomi plurali e con quelli non numerabili (milk, water, money, time).</p>
+      <p>Vogliono dire <b>"dei, delle, un po' di"</b>: una quantità che non dici con precisione. Si usano con le cose al plurale (<i>eggs</i>) e con quelle che non si contano (<i>milk, water, money, time</i>).</p>
       ${T(['', 'Uso', 'Esempio'], [['some', 'frasi affermative', "There's some milk in the fridge."], ['any', 'frasi negative', "There aren't any eggs."], ['any', 'domande', 'Are there any questions?'], ['some', 'offerte e richieste', 'Would you like some tea? · Can I have some water?']], 'plain')}
-      <p><b>No</b> equivale a <i>not any</i> e si usa con il verbo affermativo: <i>There are no eggs</i> = <i>There aren't any eggs</i>.</p>
-      ${EX(["There's <b>no</b> time.", "Non c'è tempo."], ["I haven't got <b>any</b> money.", 'Non ho soldi.'])}` },
+      <p>Al posto di <i>not any</i> puoi usare <b>no</b> con il verbo senza <i>not</i>: <i>There are no eggs</i> = <i>There aren't any eggs</i> (non ci sono uova).</p>
+      ${EX(["There's <b>no</b> time.", "Non c'è tempo."], ["I haven't got <b>any</b> money.", 'Non ho soldi.'])}
+      ${TIP(`<p><b>S</b>ome = <b>S</b>ì: frasi normali, affermative.</p><p><b>A</b>ny = <b>A</b>ltrimenti: quando c'è un <b>no</b> o un <b>?</b> (negative e domande).</p><p>Unica eccezione: quando offri o chiedi qualcosa si usa <i>some</i> anche nella domanda (<i>Would you like some tea?</i>), perché ti aspetti un sì.</p>`)}` },
     { h: 'Preposizioni di luogo', b: `
+      <p>Sono le parole che dicono <b>dove</b> si trova una cosa: dentro, sopra, sotto, accanto…</p>
       ${T(['Preposizione', 'Significato', 'Esempio'], [['in', 'dentro; città, paesi', 'in the box, in Rome, in Italy'], ['on', 'sopra (a contatto); superfici, piani', 'on the table, on the wall, on the second floor'], ['at', 'in un punto, presso', 'at the station, at the door, at home, at work'], ['under', 'sotto', 'under the bed'], ['next to', 'accanto a', 'next to the window'], ['between', 'tra (due cose)', 'between the bank and the bar'], ['in front of', 'davanti a', 'in front of the school'], ['opposite', 'di fronte (dall\'altra parte)', 'opposite the church'], ['behind', 'dietro', 'behind the door'], ['near', 'vicino a', 'near the station']], 'plain')}
-      ${N('<p><b>In front of</b> è "davanti a", dalla stessa parte: <i>in front of the school</i>. Se la farmacia è dall\'altra parte della strada rispetto alla banca, si dice <i>opposite the bank</i> (di fronte alla banca). <b>Next to</b> vuole sempre <i>to</i>; <i>near</i> e <i>opposite</i> di solito no: <i>near the station, opposite the church</i>.</p>')}` },
+      ${N('<p><b>In front of</b> = davanti a (dalla stessa parte). <b>Opposite</b> = di fronte, dall\'altra parte della strada.</p><p><b>Next to</b> vuole sempre il <i>to</i> (<i>next to the bank</i>). <i>Near</i> e <i>opposite</i> invece no: <i>near the station, opposite the church</i>.</p>')}
+      ${TIP(`<p>Immagina tre forme:</p><ul><li><b>IN</b> = una <b>scatola</b>: sei dentro (in the box, in Rome, in Italy);</li><li><b>ON</b> = un <b>tavolo</b>: sei appoggiato sopra (on the table, on the wall);</li><li><b>AT</b> = un <b>puntino</b> sulla mappa: sei lì (at the station, at home, at work).</li></ul>`)}` },
     { h: 'Errori tipici', b: ERR(
       ['There is three bedrooms.', 'There are three bedrooms.', 'Plurale: there are.'],
       ['In my town has a big park.', "There's a big park in my town.", '"C\'è" si dice con there is, non con have.'],

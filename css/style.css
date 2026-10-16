@@ -195,6 +195,13 @@ p { margin: 0 0 14px; }
 
 .note { margin: 20px 0; padding: 16px 20px; background: var(--panel); border-radius: 10px; max-width: 40em; }
 .note p { margin: 4px 0; }
+/* trucco per ricordare: il cartello giallo della linea dei verbi */
+.tip { position: relative; margin: 22px 0; padding: 14px 20px 14px 22px; border-radius: 10px; max-width: 40em;
+  background: color-mix(in srgb, var(--verbs) 14%, var(--paper)); border-left: 6px solid var(--verbs); }
+.tip .tip-h { display: inline-block; margin-bottom: 6px; padding: 1px 10px; border-radius: 999px; background: var(--verbs); color: #12204a;
+  font-size: 13px; font-weight: 600; letter-spacing: .02em; }
+.tip p { margin: 4px 0; }
+.tip ul { margin: 4px 0; padding-left: 20px; }
 
 .gap { margin-top: 60px; }
 .gap h2 { margin: 0; font-size: 34px; }

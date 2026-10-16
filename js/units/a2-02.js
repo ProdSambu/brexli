@@ -2,18 +2,21 @@ UNIT({
   id: 'a2-02', n: 2, level: 'A2', stop: 'Just, already, yet',
   title: 'Present perfect: <i>just</i>, <i>already</i>, <i>yet</i>',
   sub: 'Il passato recente che conta adesso',
-  intro: "Il secondo uso del present perfect: qualcosa è successo da poco, o non è ancora successo, e la cosa che conta è la situazione di adesso. Tre parole piccole decidono il senso della frase.",
+  intro: "Il secondo uso del present perfect: una cosa è successa da poco (o non è ancora successa) e quello che conta è <b>com'è la situazione adesso</b>. Tre parole piccole, <i>just, already, yet</i>, decidono il senso della frase.",
   theory: [
     { h: 'Un risultato che vale adesso', b: `
-      <p>Il present perfect collega il passato al presente: non interessa <i>quando</i> è successo, ma che <i>adesso</i> la situazione è quella.</p>
+      <p>Qui il present perfect fa da <b>ponte tra il passato e adesso</b>: non ti interessa <i>quando</i> è successo, ma come stanno le cose <i>ora</i>.</p>
       ${EX(["I've <b>lost</b> my keys.", 'Ho perso le chiavi. (e ora non le ho)'], ["Look! It's <b>stopped</b> raining.", 'Guarda, ha smesso di piovere.'], ["She's <b>broken</b> her arm.", 'Si è rotta un braccio. (ce l\'ha ingessato)'])}
-      <p>Confronta: <i>I lost my keys yesterday, but I found them</i>. Qui c'è un momento preciso e una storia chiusa: past simple.</p>` },
+      <p>Confronta: <i>I lost my keys yesterday, but I found them</i> (ieri ho perso le chiavi, ma le ho ritrovate). Qui c'è un momento preciso e la storia è finita: past simple.</p>
+      ${TIP(`<p>Chiediti: <b>"Si vede ancora adesso?"</b> Le chiavi mancano ancora → <i>I've lost my keys</i>. È una storia finita di ieri → <i>I lost my keys yesterday</i>.</p>`)}` },
     { h: 'Just, already, yet', b: `
+      <p>Sono tre parole piccole che si usano tantissimo con il present perfect:</p>
       ${T(['Parola', 'Significato', 'Posizione', 'Esempio'], [['just', 'appena', 'tra have e il participio', "I've <b>just</b> finished."], ['already', 'già (prima del previsto)', 'tra have e il participio', "She's <b>already</b> left."], ['yet', 'ancora (negative) · già (domande)', 'in fondo alla frase', "I haven't eaten <b>yet</b>. · Have you eaten <b>yet</b>?"]], 'plain')}
       ${EX(["We've <b>just</b> arrived.", 'Siamo appena arrivati.'], ["I've <b>already</b> seen this film.", 'Ho già visto questo film.'], ["He hasn't called <b>yet</b>.", 'Non ha ancora chiamato.'], ['Have you finished <b>yet</b>?', 'Hai già finito? / Hai finito?'])}
-      ${N("<p>Attenzione: \"già\" si traduce <b>already</b> nelle affermative e di solito <b>yet</b> nelle domande. \"Non ancora\" è <b>not ... yet</b>, con yet in fondo. Da solo, come risposta: <i>Not yet.</i> (Non ancora.)</p>")}` },
+      ${N("<p>\"Già\" si dice <b>already</b> nelle frasi normali, ma di solito <b>yet</b> nelle domande.</p><p>\"Non ancora\" è <b>not … yet</b>, con <i>yet</i> in fondo. Come risposta da sola: <i>Not yet.</i> (Non ancora.)</p>")}
+      ${TIP(`<p><b>Just</b> e <b>already</b> stanno <b>in mezzo</b>, attaccati al verbo, come in italiano: "ho <b>appena</b> finito", "ho <b>già</b> visto".</p><p><b>Yet</b> sta sempre <b>in fondo</b>, come l'ultima parola del discorso, e solo nelle domande e nelle frasi con "non".</p>`)}` },
     { h: 'Inglese britannico e americano', b: `
-      <p>Negli Stati Uniti con <i>just, already, yet</i> si usa spesso il past simple: <i>I just ate. Did you finish yet?</i> Nell'inglese britannico, quello di questo corso, si preferisce il present perfect: <i>I've just eaten. Have you finished yet?</i> Capirai entrambi; scrivi la forma britannica.</p>` },
+      <p>Negli Stati Uniti con <i>just, already, yet</i> si usa spesso il past simple: <i>I just ate. Did you finish yet?</i></p><p>Nell'inglese britannico invece si preferisce il present perfect: <i>I've just eaten. Have you finished yet?</i> Li capirai tutti e due; negli esercizi scrivi la forma britannica.</p>` },
     { h: 'Errori tipici', b: ERR(
       ["I've finished just.", "I've just finished.", 'Just va tra have e il participio.'],
       ['I have finished yet.', "I've already finished.", 'Nelle affermative "già" è already.'],

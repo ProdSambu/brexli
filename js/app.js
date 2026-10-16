@@ -507,6 +507,8 @@ const wordsOf = t => [...new Set(String(t).toLowerCase().match(/[a-z][a-z']*/g) 
 // Sceglie la sezione di teoria più vicina all'esercizio: conta le parole inglesi in comune,
 // pesando di più quelle che compaiono in poche sezioni
 function sectionFor(u, ex) {
+  // un esercizio può dire da sé a che sezione appartiene
+  if (ex.sec) { const k = u.theory.findIndex(s => s.h === ex.sec); if (k >= 0) return k; }
   const secs = u.theory.map(s => plain(s.b).toLowerCase().replace(/\s+/g, ' '));
   if (ex.t === 'd') { const k = secs.findIndex(s => s.includes(ex.a[0].toLowerCase())); if (k >= 0) return k; }
   const words = wordsOf([ex.q, ex.h, ...(Array.isArray(ex.a) ? ex.a : [ex.a]), ...(ex.o || [])].join(' '));

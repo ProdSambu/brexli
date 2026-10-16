@@ -2,28 +2,35 @@ UNIT({
   id: 'a1-04', n: 4, level: 'A1', stop: 'Present simple',
   title: 'Present simple: forma affermativa',
   sub: 'Abitudini e fatti, la -s della terza persona, regole di scrittura',
-  intro: "Il primo vero tempo verbale. È facilissimo da formare, ma ha una trappola che resta attaccata per anni: la -s alla terza persona singolare.",
+  intro: "Il primo vero tempo dei verbi. Si forma in un attimo, ma ha una trappola in cui cadono tutti per anni: la <b>-s</b> con he, she, it.",
   theory: [
     { h: 'Quando si usa', b: `
-      <p>Il present simple descrive cose che sono vere in generale o che si ripetono: abitudini, routine, fatti, stati permanenti.</p>
+      <p>Il present simple serve per le cose che <b>fai di solito</b> o che <b>sono sempre vere</b>: abitudini, routine, fatti.</p>
       ${EX(['I <b>work</b> in Milan.', 'Lavoro a Milano.'], ['She <b>drinks</b> coffee every morning.', 'Beve il caffè tutte le mattine.'], ['Water <b>boils</b> at 100 degrees.', "L'acqua bolle a 100 gradi."], ['We <b>live</b> near the station.', 'Abitiamo vicino alla stazione.'])}
-      <p>Non si usa per ciò che sta succedendo in questo momento: per quello c'è il present continuous (unità 7). Il presente italiano copre entrambi i casi, l'inglese no.</p>` },
+      <p>Non si usa per quello che stai facendo <b>proprio adesso</b>: per quello c'è il present continuous (fermata 7). In italiano "lavoro" vale per tutti e due i casi, in inglese no.</p>
+      ${TIP(`<p>Present <b>simple</b> = la tua vita <b>di solito</b>: ogni giorno, il lunedì, sempre. Se puoi aggiungere "di solito" alla frase italiana senza cambiarne il senso, è present simple.</p>`)}` },
     { h: 'Come si forma', b: `
-      <p>Si usa la forma base del verbo (l'infinito senza <i>to</i>) per tutte le persone, <b>tranne he, she, it, che aggiungono -s</b>.</p>
+      <p>Prendi il verbo così com'è (<i>work, live, eat</i>) e usalo uguale per tutti. C'è <b>una sola eccezione</b>: con <b>he, she, it</b> aggiungi una <b>-s</b>.</p>
       ${T(['Persona', 'work', 'live'], [['I', 'work', 'live'], ['you', 'work', 'live'], ['<b>he / she / it</b>', '<b>works</b>', '<b>lives</b>'], ['we', 'work', 'live'], ['they', 'work', 'live']])}
-      <p>La -s va con qualunque soggetto singolare di terza persona, anche nomi e parole come <i>everybody, nobody, my mother, the shop</i>.</p>
-      ${EX(['My mother <b>works</b> in a hospital.', 'Mia madre lavora in ospedale.'], ['Everybody <b>knows</b> him.', 'Lo conoscono tutti.'], ['The shop <b>opens</b> at nine.', 'Il negozio apre alle nove.'])}` },
+      <p>La -s ci vuole ogni volta che il soggetto è <b>una persona o una cosa sola</b> (cioè ogni volta che potresti dire he, she o it): <i>my mother, the shop, Anna, everybody</i>.</p>
+      ${EX(['My mother <b>works</b> in a hospital.', 'Mia madre lavora in ospedale.'], ['Everybody <b>knows</b> him.', 'Lo conoscono tutti.'], ['The shop <b>opens</b> at nine.', 'Il negozio apre alle nove.'])}
+      ${TIP(`<p>Ripeti: <b>"He, she, it: la -s ci va!"</b></p><p>Pensa che <b>he, she, it</b> sono da soli, e allora il verbo gli fa compagnia con una -s in più. <i>They</i> e <i>we</i> sono già in tanti: niente -s.</p>`)}` },
     { h: 'Regole di scrittura della -s', b: `
+      <p>Quasi sempre basta aggiungere <b>-s</b>. Solo con alcune lettere finali la parola cambia un po', per riuscire a pronunciarla:</p>
       ${T(['Il verbo finisce in…', 'Si aggiunge', 'Esempi'], [['-s, -ss, -sh, -ch, -x, -o', '-es', 'watch → watches, finish → finishes, go → goes, do → does'], ['consonante + y', '-ies', 'study → studies, try → tries, fly → flies'], ['vocale + y', '-s', 'play → plays, buy → buys, say → says'], ['tutti gli altri', '-s', 'work → works, eat → eats']], 'plain')}
-      ${N('<p>A parte <i>be</i> (he <b>is</b>), l\'unico verbo con una terza persona davvero irregolare è <b>have → has</b>: <i>He has a dog</i>, non <i>he haves</i>.</p>')}` },
+      ${N('<p>Oltre a <i>be</i> (he <b>is</b>), c\'è un solo verbo strano: <b>have → has</b>. Si dice <i>He has a dog</i>, non <i>he haves</i>.</p>')}
+      ${TIP(`<p><b>-es</b>: prova a dire "watchs" o "finishs", non si riesce. Ci vuole una sillaba in più: <i>watch-es, finish-es</i>.</p><p><b>-ies</b>: la <b>y</b> diventa <b>ie</b> solo se prima c'è una consonante (stud<b>y</b> → stud<b>ies</b>). Se prima c'è una vocale, la y resta: pl<b>ay</b> → pl<b>ays</b>.</p>`)}` },
     { h: 'Le espressioni di tempo', b: `
+      <p>Sono le parole che dicono <b>quando</b> o <b>quante volte</b>. Con il present simple trovi spesso queste:</p>
       ${T(['Inglese', 'Italiano'], [['every day / every week', 'ogni giorno / ogni settimana'], ['on Mondays', 'il lunedì (tutti i lunedì)'], ['at the weekend', 'nel fine settimana'], ['in the morning / in the evening', 'di mattina / di sera'], ['at night', 'di notte'], ['once a week', 'una volta alla settimana'], ['twice a month', 'due volte al mese']], 'plain')}
       ${EX(['I go to the gym <b>twice a week</b>.', 'Vado in palestra due volte alla settimana.'], ['He plays football <b>on Saturdays</b>.', 'Gioca a calcio il sabato.'])}
-      ${N("<p>Le espressioni di tempo di solito vanno <b>in fondo</b> alla frase (o all'inizio), non in mezzo tra verbo e complemento.</p>")}` },
+      ${N("<p>Queste espressioni vanno <b>in fondo</b> alla frase (oppure all'inizio). Non in mezzo: <i>I go to work every day</i>, non <i>I go every day to work</i>.</p>")}
+      ${TIP(`<p>In inglese la frase è un treno con i vagoni in ordine fisso: <b>chi → fa cosa → che cosa / dove → quando</b>. Il "quando" è l'ultimo vagone.</p>`)}` },
     { h: 'Verbi di stato', b: `
-      <p>Alcuni verbi non descrivono azioni ma stati: gusti, pensieri, possesso. Si usano quasi sempre al present simple, anche se il riferimento è "adesso".</p>
+      <p>Alcuni verbi non sono azioni ma <b>stati</b>: cosa ti piace, cosa sai, cosa vuoi. Questi restano al present simple anche quando parli di adesso.</p>
       ${T(['Gusti', 'Mente', 'Altro'], [['like, love, hate, prefer', 'know, understand, believe, remember', 'want, need, own, belong']], 'plain')}
-      ${EX(['I <b>know</b> the answer.', 'So la risposta.'], ['She <b>wants</b> a new phone.', 'Vuole un telefono nuovo.'])}` },
+      ${EX(['I <b>know</b> the answer.', 'So la risposta.'], ['She <b>wants</b> a new phone.', 'Vuole un telefono nuovo.'])}
+      ${TIP(`<p>Sono verbi che <b>non si vedono fare</b>: non puoi fotografare qualcuno mentre "sa" o mentre "vuole". Per questo non si mettono mai in -ing.</p>`)}` },
     { h: 'Errori tipici', b: ERR(
       ['He work in a bank.', 'He works in a bank.', 'Terza persona singolare: serve la -s.'],
       ['My parents lives in Turin.', 'My parents live in Turin.', 'My parents è plurale: niente -s.'],
