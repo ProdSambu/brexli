@@ -486,7 +486,7 @@ function lesson(u) {
       ? `<section class="gap"><h2>Mind the gap</h2><p class="sub">Gli errori tipici di chi parte dall'italiano</p><div class="edge"></div>${s.b}</section>`
       : `<h2>${s.h}</h2>${s.b}`).join('')}
     <div class="depart">
-      <div><b>${u.exercises.length} esercizi</b><p>Completi, traduci, correggi e scrivi sotto dettatura. Con almeno l'80% la fermata è superata.</p></div>
+      <div><b>Circa ${Math.min(u.exercises.length, GEN[u.id] ? 12 : 20) + (GEN[u.id] ? 8 : 0) + Math.min(2, u.dict.length)} esercizi, ogni volta diversi</b><p>Completi, traduci, correggi e scrivi sotto dettatura. Con almeno l'80% la fermata è superata.</p></div>
       <a class="btn" href="#/u/${u.id}/pratica">Fai gli esercizi</a>
     </div>
   </article>`;
@@ -743,12 +743,34 @@ function resultScreen({ right, total, wrong, marks }, { num, title, line, passTe
 }
 
 /* ---------- ripasso degli errori ---------- */
-const exerciseOf = r => UNITS.find(u => u.id === r.u)?.exercises[r.k];
+// Una voce del ripasso ricorda la regola sbagliata, non la frase: k = esercizio scritto a mano,
+// g = generatore (ogni volta una frase nuova), d = dettato. Le voci vecchie hanno solo u e k.
+const unitOf = id => UNITS.find(u => u.id === id);
+const reviewKey = it => it.rid || `${it.u.id}:${it.g ? 'g' + it.g : it.d ? 'd' : 'k' + it.k}`;
+const keyOf = r => r.id || `${r.u}:${r.g ? 'g' + r.g : r.d ? 'd' : 'k' + r.k}`;
+function exerciseOf(r) {
+  const u = unitOf(r.u); if (!u) return null;
+  if (r.g) return GEN[r.u]?.[r.g] ? true : null;
+  if (r.d) return u.dict.length ? true : null;
+  return u.exercises[r.k] || null;
+}
+// Che cosa proporre nel ripasso per una voce: una frase nuova sulla stessa regola, quando si può
+function reviewItem(r) {
+  const u = unitOf(r.u), rid = keyOf(r);
+  if (r.g) return { ex: GEN.make(r.u, r.g), u, g: r.g, rid };
+  if (r.d) return { ex: { t: 'd', a: [pick(u.dict)] }, u, d: true, rid };
+  // esercizio scritto a mano: una volta su tre lo stesso, le altre una variante generata della stessa unità
+  if (GEN[r.u] && Math.random() < 0.67) { const ex = GEN.make(r.u); return { ex, u, g: ex.gen, rid }; }
+  return { ex: u.exercises[r.k], u, k: r.k, rid };
+}
+const pick = a => a[Math.floor(Math.random() * a.length)];
 function trackReview(it, ok) {
   if (it.u == null) return;
-  const idx = data.review.findIndex(r => r.u === it.u.id && r.k === it.k);
+  const key = reviewKey(it);
+  const idx = data.review.findIndex(r => keyOf(r) === key);
   if (!ok) {
-    if (idx < 0) data.review.push({ u: it.u.id, k: it.k, s: 0 }); else data.review[idx].s = 0;
+    if (idx < 0) data.review.push({ id: key, u: it.u.id, ...(it.g ? { g: it.g } : it.d ? { d: true } : { k: it.k }), s: 0 });
+    else data.review[idx].s = 0;
   } else if (idx >= 0) {
     data.review[idx].s++;
     if (data.review[idx].s >= 2) data.review.splice(idx, 1);
@@ -760,7 +782,16 @@ const replay = hash => `onclick="location.hash='${hash}';dispatchEvent(new HashC
 
 function practiceUnit(u) {
   document.title = `Esercizi: ${plain(u.title)} — Brexli`;
-  const items = shuffle(u.exercises.map((ex, k) => ({ ex, u, k })));
+  // Ogni sessione è diversa: una parte degli esercizi scritti a mano, frasi nuove generate e qualche dettato
+  const hand = shuffle(u.exercises.map((ex, k) => ({ ex, u, k }))).slice(0, GEN[u.id] ? 12 : 20);
+  const made = [], seen = new Set();
+  for (let tries = 0; GEN[u.id] && made.length < 8 && tries < 60; tries++) {
+    const ex = GEN.make(u.id);
+    if (seen.has(ex.q)) continue;
+    seen.add(ex.q); made.push({ ex, u, g: ex.gen });
+  }
+  const dict = shuffle(u.dict).slice(0, 2).map(t => ({ ex: { t: 'd', a: [t] }, u, d: true }));
+  const items = shuffle([...hand, ...made, ...dict]);
   session({
     items, back: `#/u/${u.id}`, line: LV_COLOR[u.level], onAnswer: trackReview,
     onEnd: res => {
@@ -782,7 +813,7 @@ function reviewPage(start) {
   document.title = 'Ripasso — Brexli';
   const list = data.review.filter(exerciseOf);
   if (start === 'via' && list.length) {
-    const items = shuffle(list).slice(0, 15).map(r => ({ ex: exerciseOf(r), u: UNITS.find(u => u.id === r.u), k: r.k }));
+    const items = shuffle(list).slice(0, 15).map(reviewItem);
     return session({
       items, back: '#/ripasso', line: 'var(--ink)', onAnswer: trackReview,
       onEnd: res => resultScreen(res, { num: '↺', line: 'var(--ink)', title: 'Ripasso degli errori', reviewNote: 'Restano nel ripasso finché non li risolvi due volte di fila.',

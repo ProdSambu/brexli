@@ -1,13 +1,11 @@
 // Strumenti per scrivere le unità: ogni file in js/units chiama UNIT({...}).
 window.UNITS = [];
-// Ogni unità riceve anche 4 dettati, scelti tra le frasi d'esempio della teoria.
-// Vanno in fondo agli esercizi, così gli indici di quelli scritti a mano non cambiano.
+// Ogni unità tiene l'elenco delle frasi d'esempio adatte al dettato (da 3 a 10 parole):
+// a ogni sessione se ne pescano alcune a caso.
 window.UNIT = u => {
   const says = [];
   for (const s of u.theory) for (const m of s.b.matchAll(/data-say="([^"]*)"/g)) says.push(m[1].replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&amp;/g, '&'));
-  const good = says.filter(t => /^[A-Z][^—/()]*[.?!]$/.test(t) && t.split(' ').length >= 3 && t.split(' ').length <= 10);
-  const picks = good.length <= 4 ? good : [0, 1, 2, 3].map(k => good[Math.round(k * (good.length - 1) / 3)]);
-  for (const t of [...new Set(picks)]) u.exercises.push({ t: 'd', a: [t] });
+  u.dict = [...new Set(says.filter(t => /^[A-Z][^—/()]*[.?!]$/.test(t) && t.split(' ').length >= 3 && t.split(' ').length <= 10))];
   UNITS.push(u);
 };
 
