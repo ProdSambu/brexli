@@ -14,7 +14,7 @@ data = PROGRESS.cleanProgress(data);
 const saveLocal = () => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch {} updateCount(); };
 const save = () => { saveLocal(); schedulePush(); };
 function updateCount() {
-  const n = data.review.filter(r => exerciseOf(r)).length;
+  const n = data.review.filter(r => topicInfo(r.id)).length;
   $('#revcount').textContent = n ? n : '';
 }
 
@@ -63,6 +63,7 @@ function syncText() {
 }
 function applyRemote(remote) {
   data = PROGRESS.mergeProgress(data, remote || {});
+  normalizeReview(); // un altro dispositivo può avere ancora il ripasso nel formato vecchio
   saveLocal();
 }
 let pushTimer = null, pushing = null;
@@ -220,8 +221,12 @@ let voice = null;
 function pickVoice() {
   if (!canSpeak) return;
   const vs = speechSynthesis.getVoices();
-  voice = vs.find(v => v.lang === 'en-GB' && /natural|online|google/i.test(v.name))
-    || vs.find(v => v.lang === 'en-GB') || vs.find(v => /^en[-_]/i.test(v.lang)) || null;
+  // come le registrazioni del corso: inglese americano, voce maschile, se il browser ce l'ha
+  const us = vs.filter(v => /^en[-_]US/i.test(v.lang));
+  const male = /guy|andrew|brian|christopher|eric|roger|steffan|davis|david|mark|tony|jason|male/i;
+  voice = us.find(v => male.test(v.name) && /natural|online/i.test(v.name)) || us.find(v => male.test(v.name))
+    || us.find(v => /natural|online|google/i.test(v.name)) || us[0]
+    || vs.find(v => /^en[-_]/i.test(v.lang)) || null;
 }
 if (canSpeak) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
 let warnedVoice = false, player = null;
@@ -239,12 +244,12 @@ function say(text, rate = 1) {
   if (!voice) pickVoice();
   // Voci caricate ma nessuna inglese: meglio non leggere l'inglese con una voce italiana
   if (!voice && speechSynthesis.getVoices().length) {
-    if (!warnedVoice) toast('Il browser non ha una voce inglese installata. Su Windows: Impostazioni → Ora e lingua → Voce → Aggiungi voci → English (United Kingdom). Oppure apri il sito con Edge o Chrome.');
+    if (!warnedVoice) toast('Il browser non ha una voce inglese installata. Su Windows: Impostazioni → Ora e lingua → Voce → Aggiungi voci → English (United States). Oppure apri il sito con Edge o Chrome.');
     warnedVoice = true;
     return Promise.resolve();
   }
   const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'en-GB'; if (voice) u.voice = voice; u.rate = 0.92 * rate;
+  u.lang = 'en-US'; if (voice) u.voice = voice; u.rate = 0.92 * rate;
   return new Promise(res => { u.onend = u.onerror = res; speechSynthesis.speak(u); });
 }
 document.addEventListener('click', e => {
@@ -486,7 +491,7 @@ function lesson(u) {
       ? `<section class="gap"><h2>Mind the gap</h2><p class="sub">Gli errori tipici di chi parte dall'italiano</p><div class="edge"></div>${s.b}</section>`
       : `<h2>${s.h}</h2>${s.b}`).join('')}
     <div class="depart">
-      <div><b>Circa ${Math.min(u.exercises.length, GEN[u.id] ? 12 : 20) + (GEN[u.id] ? 8 : 0) + Math.min(2, u.dict.length)} esercizi, ogni volta diversi</b><p>Completi, traduci, correggi e scrivi sotto dettatura. Con almeno l'80% la fermata è superata.</p></div>
+      <div><b>22 esercizi, ogni volta diversi</b><p>Completi, traduci, correggi e scrivi sotto dettatura. Con almeno l'80% la fermata è superata.</p></div>
       <a class="btn" href="#/u/${u.id}/pratica">Fai gli esercizi</a>
     </div>
   </article>`;
@@ -531,15 +536,17 @@ function verbOf(ex) {
   }
   return null;
 }
-function openHelp(it) {
-  const ex = it.ex, u = it.u, v = verbOf(ex);
+function openHelp(it, forceSec = null) {
+  const ex = it.ex || {}, u = it.u, v = it.ex ? verbOf(ex) : null;
   let d = $('#drawer');
   if (!d) {
     d = document.createElement('div'); d.id = 'drawer';
     document.body.appendChild(d);
     d.addEventListener('click', e => { if (e.target === d || e.target.closest('.dclose')) closeHelp(); });
   }
-  const best = u ? sectionFor(u, ex) : -1;
+  // la sezione da aprire: quella della regola dell'esercizio, altrimenti la più vicina alla domanda
+  const skillSec = ex.skill && SKILLS.by[ex.skill] ? [].concat(SKILLS.by[ex.skill].sec)[0] : null;
+  const best = forceSec != null ? forceSec : !u ? -1 : skillSec ? Math.max(0, u.theory.findIndex(s => s.h === skillSec)) : sectionFor(u, ex);
   const verbBox = v ? `<div class="dverb"><div><b>to ${v.b}</b>${v.it ? ` <span>${esc(v.it)}</span>` : ''}</div>
       <div class="para"><div><small>past simple</small><b>${v.p}</b></div><div><small>participio</small><b>${v.pp}</b></div><div><small>-ing</small><b>${v.ing}</b></div><div><small>he, she, it</small><b>${v.third}</b></div></div>
       <a href="#/verbi/${v.b}" target="_blank" rel="noopener">Tutti i tempi di ${v.b}, in una nuova scheda</a></div>` : '';
@@ -634,6 +641,7 @@ function session({ items, back, line, onAnswer, onEnd }) {
         // una svista di battitura in un campo ("brougth") vale, ma la segnaliamo
         const typoP = !valid(p, v.p) && EXPLAIN.typoWord(p, v.p), typoPP = !valid(pp, v.pp) && EXPLAIN.typoWord(pp, v.pp);
         ok = (valid(p, v.p) || !!typoP) && (valid(pp, v.pp) || !!typoPP);
+        yours = `${p.trim()}, ${pp.trim()}`;
         if (ok && (typoP || typoPP)) note = `Hai fatto un errore di battitura: ${[[p, typoP], [pp, typoPP]].filter(x => x[1]).map(([u, t]) => `<s>${esc(u.trim())}</s> → <b>${esc(t)}</b>`).join(', ')}.`;
         if (!ok && !giveUp) { const r = EXPLAIN.irregular(v, p, pp); if (r.length) explain = `<ul class="reasons">${r.map(x => `<li>${x}</li>`).join('')}</ul>`; }
         sol = `<span>${v.b} – <b>${v.p}</b> – <b>${v.pp}</b></span> ${sayBtn(`${v.b}, ${v.p1}, ${v.pp1}`)}`;
@@ -653,17 +661,29 @@ function session({ items, back, line, onAnswer, onEnd }) {
       }
       checked = true;
       marks[i] = ok;
+      // Il motivo preciso dell'errore: gli esercizi generati sanno quale regola mettono alla prova
+      let mine = '';
+      if (!ok && !giveUp && ex.diag) {
+        const raw = ex.t === 'c' ? choice : ex.t === 'f' ? ($('#body input')?.value || '') : yours;
+        try { mine = ex.diag(raw, yours) || ''; } catch { mine = ''; }
+      }
+      if (mine && explain) explain = explain.replace(/<ul class="reasons">[\s\S]*<\/ul>/, ''); // il motivo preciso sostituisce quelli generici
+      const rule = ex.why || topicInfo(topicOf(it))?.rule || '';
+      const rightText = ex.t === 'irr' ? `${ex.v.b}, ${ex.v.p1}, ${ex.v.pp1}` : ex.t === 'c' ? (ex.q.includes('___') ? ex.q.replace('___', ex.a) : ex.a) : accepted(ex)[0];
       if (ok) right++; else wrong.push({ it, yours });
-      onAnswer && onAnswer(it, ok);
+      onAnswer && onAnswer(it, ok, { you: giveUp ? '(non lo so)' : yours, right: rightText });
       $('.track').outerHTML = trackHTML(total, marks, i);
       fb.className = 'fb ' + (ok ? 'ok' : 'no');
+      const showSol = !ok && !(explain && ex.t !== 'c' && ex.t !== 'irr');
       fb.innerHTML = `<div class="verdict">${ok ? 'Giusto' : giveUp ? 'Ecco la risposta' : 'Non proprio'}</div>
         ${note ? `<div class="why">${note}</div>` : ''}
         ${ok && ex.t !== 'irr' && ex.t !== 'c' && acc0differs(ex, yours) ? `<div class="sol">Un'altra soluzione: ${sol}</div>` : ''}
+        ${mine ? `<div class="mine"><span class="lab">Il tuo errore</span><div>${mine}</div></div>` : ''}
         ${!ok && explain && ex.t !== 'c' && ex.t !== 'irr' ? explain : ''}
-        ${!ok && !(explain && ex.t !== 'c' && ex.t !== 'irr') ? `<div class="sol">${!giveUp && yours && ex.t !== 'c' && ex.t !== 'irr' ? `<span class="yours">${esc(yours)}</span>` : ''}${sol}</div>` : ''}
+        ${showSol ? `<div class="sol">${!giveUp && yours && ex.t !== 'c' && ex.t !== 'irr' ? `<span class="yours">${esc(yours)}</span>` : ''}${sol}</div>` : ''}
         ${!ok && explain && (ex.t === 'c' || ex.t === 'irr') ? explain : ''}
-        ${ex.why ? `<div class="why">${ex.why}</div>` : ''}`;
+        ${!ok && rule ? `<div class="rule"><span class="lab">La regola</span><div>${rule}</div>${it.u ? '<button class="link" type="button" id="fbhelp">Rivedi la spiegazione completa</button>' : ''}</div>` : ok && ex.why ? `<div class="why">${ex.why}</div>` : ''}`;
+      if ($('#fbhelp')) $('#fbhelp').onclick = () => openHelp(it);
       go.style.display = '';
       go.textContent = i + 1 < total ? 'Avanti' : 'Vedi il risultato';
       go.onclick = () => { i++; show(); };
@@ -689,6 +709,8 @@ function session({ items, back, line, onAnswer, onEnd }) {
   show();
 }
 const acc0differs = (ex, yours) => yours && !matches(yours, [accepted(ex)[0]]);
+// nomi propri: restano maiuscoli anche come prima tessera
+const PROPER = /^(Anna|Luca|Mr|Mrs|Sara|Tom|Marco|Giulia|Paul|Emma|Rossi|London|Rome|Milan|Italy|Italian|English|Paris|Naples|Turin|Dad|Mum|Monday|Mondays)$/;
 
 function body(ex) {
   const field = ph => `<input class="line" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${ph}">`;
@@ -709,7 +731,7 @@ function body(ex) {
   if (ex.t === 'o') {
     // la maiuscola iniziale svelerebbe la prima parola: la togliamo (tranne I, I'm…)
     const words = ex.a[0].replace(/[.,!?]/g, '').split(/\s+/).concat(ex.d || [])
-      .map((w, k) => k === 0 && !/^I('|$)/.test(w) ? w[0].toLowerCase() + w.slice(1) : w);
+      .map((w, k) => k === 0 && !/^I('|$)/.test(w) && !PROPER.test(w) ? w[0].toLowerCase() + w.slice(1) : w);
     let mixed = shuffle(words); let tries = 0;
     while (mixed.join(' ') === words.join(' ') && tries++ < 10) mixed = shuffle(words);
     return `<p class="prompt">${esc(ex.it)}</p><div class="built"></div><div class="pool">${mixed.map(w => `<button class="chip" type="button">${esc(w)}</button>`).join('')}</div>`;
@@ -732,68 +754,132 @@ function resultScreen({ right, total, wrong, marks }, { num, title, line, passTe
     <div class="score"><b>${pct}%</b><span>${right} risposte giuste su ${total}</span></div>
     ${trackHTML(total, marks)}
     ${advice ? `<p style="margin-top:18px">${advice}</p>` : ''}
-    ${wrong.length ? `<h2>Da rivedere</h2><ul class="mistakes">${wrong.map(({ it }) => {
+    ${(() => {
+      // le regole sbagliate in questa sessione, con il link per esercitarsi subito su ognuna
+      const by = {};
+      for (const { it } of wrong) { const id = it.u ? topicOf(it) : null; if (id && topicInfo(id)) (by[id] ||= 0), by[id]++; }
+      const ids = Object.keys(by).sort((a, b) => by[b] - by[a]);
+      return ids.length ? `<h2>Le regole da ripassare</h2><ul class="rules-todo">${ids.map(id => `<li><div><b>${topicInfo(id).name}</b><span>${by[id]} ${by[id] === 1 ? 'errore' : 'errori'}</span></div><a class="btn ghost" href="#/ripasso/t/${encodeURIComponent(id)}">Esercitati</a></li>`).join('')}</ul>` : '';
+    })()}
+    ${wrong.length ? `<h2>I tuoi errori</h2><ul class="mistakes">${wrong.map(({ it, yours }) => {
       const ex = it.ex;
       const q = ex.t === 'irr' ? ex.v.it : ex.t === 'd' ? 'Dettato' : ex.it || ex.q;
       const a = ex.t === 'irr' ? `${ex.v.b}, ${ex.v.p1}, ${ex.v.pp1}` : SPEECH.sayTexts(ex)[0] || accepted(ex)[0];
-      return `<li><span class="q">${esc(q)}</span>${sayBtn(a)}<span>${esc(a)}</span></li>`;
+      return `<li><span class="q">${esc(q)}</span>${yours ? `<span class="you">${esc(yours)}</span>` : ''}${sayBtn(a)}<span>${esc(a)}</span></li>`;
     }).join('')}</ul>${reviewNote ? `<p class="small">${reviewNote}</p>` : ''}` : ''}
     <div class="actions">${again}</div>
   </section>`;
 }
 
-/* ---------- ripasso degli errori ---------- */
-// Una voce del ripasso ricorda la regola sbagliata, non la frase: k = esercizio scritto a mano,
-// g = generatore (ogni volta una frase nuova), d = dettato. Le voci vecchie hanno solo u e k.
+/* ---------- regole e ripasso ---------- */
+// Il ripasso è fatto di REGOLE, non di frasi: ogni errore finisce sotto la sua regola (una skill dei
+// generatori, oppure la sezione di teoria per gli esercizi scritti a mano, oppure il dettato).
+// Voce: { id, u, n: errori, last: [{ q, you, right }], at }
 const unitOf = id => UNITS.find(u => u.id === id);
-const reviewKey = it => it.rid || `${it.u.id}:${it.g ? 'g' + it.g : it.d ? 'd' : 'k' + it.k}`;
-const keyOf = r => r.id || `${r.u}:${r.g ? 'g' + r.g : r.d ? 'd' : 'k' + r.k}`;
-function exerciseOf(r) {
-  const u = unitOf(r.u); if (!u) return null;
-  if (r.g) return GEN[r.u]?.[r.g] ? true : null;
-  if (r.d) return u.dict.length ? true : null;
-  return u.exercises[r.k] || null;
-}
-// Che cosa proporre nel ripasso per una voce: una frase nuova sulla stessa regola, quando si può
-function reviewItem(r) {
-  const u = unitOf(r.u), rid = keyOf(r);
-  if (r.g) return { ex: GEN.make(r.u, r.g), u, g: r.g, rid };
-  if (r.d) return { ex: { t: 'd', a: [pick(u.dict)] }, u, d: true, rid };
-  // esercizio scritto a mano: una volta su tre lo stesso, le altre una variante generata della stessa unità
-  if (GEN[r.u] && Math.random() < 0.67) { const ex = GEN.make(r.u); return { ex, u, g: ex.gen, rid }; }
-  return { ex: u.exercises[r.k], u, k: r.k, rid };
-}
 const pick = a => a[Math.floor(Math.random() * a.length)];
-function trackReview(it, ok) {
-  if (it.u == null) return;
-  const key = reviewKey(it);
-  const idx = data.review.findIndex(r => keyOf(r) === key);
-  if (!ok) {
-    if (idx < 0) data.review.push({ id: key, u: it.u.id, ...(it.g ? { g: it.g } : it.d ? { d: true } : { k: it.k }), s: 0 });
-    else data.review[idx].s = 0;
-  } else if (idx >= 0) {
-    data.review[idx].s++;
-    if (data.review[idx].s >= 2) data.review.splice(idx, 1);
+const promptOf = ex => ex.t === 'irr' ? ex.v.b : ex.t === 'd' ? 'Dettato' : ex.it || ex.q || '';
+// A che regola appartiene un esercizio
+function topicOf(it) {
+  if (!it || !it.u) return null;
+  if (it.topic) return it.topic;
+  const ex = it.ex, u = it.u;
+  if (ex.skill) return ex.skill;
+  if (ex.t === 'd') return `${u.id}:dict`;
+  const k = sectionFor(u, ex), heading = u.theory[k].h;
+  const sk = SKILLS.forSection(u.id, heading)[0];
+  return sk ? sk.id : `${u.id}:sec:${k}`;
+}
+// Nome, spiegazione e sezione di teoria di una regola
+function topicInfo(id) {
+  if (!id) return null;
+  if (SKILLS.by[id]) {
+    const s = SKILLS.by[id], u = unitOf(s.unit);
+    return { id, u: s.unit, name: s.name, rule: s.rule, sec: Math.max(0, u.theory.findIndex(t => t.h === [].concat(s.sec)[0])), skill: s };
   }
+  const [uid, kind, k] = id.split(':'), u = unitOf(uid);
+  if (!u) return null;
+  if (kind === 'dict') return { id, u: uid, name: 'Dettato: capire ascoltando', rule: 'Ascolta più volte, anche al rallentatore, e scrivi parola per parola. Attenzione alle parole piccole (a, the, to, is) e alle forme contratte (I\'m, don\'t).', sec: 0, dict: true };
+  const sec = Number(k) || 0, h = u.theory[sec]?.h || '';
+  const first = plain(u.theory[sec]?.b || '').replace(/\s+/g, ' ').trim();
+  return { id, u: uid, name: h === 'Errori tipici' ? `${u.stop}: gli errori tipici` : h, rule: first.length > 280 ? first.slice(0, 277).replace(/\s+\S*$/, '') + '…' : first, sec };
+}
+// Le voci vecchie (una per esercizio) diventano voci per regola
+function normalizeReview() {
+  const out = [];
+  for (const r of data.review) {
+    let id = r.n != null && !/:(k\d+|g\w+|d)$/.test(r.id || '') ? r.id : null;
+    const u = unitOf(r.u); if (!u) continue;
+    if (!id) {
+      if (r.d || /:d$/.test(r.id || '')) id = `${u.id}:dict`;
+      else if (r.k != null && u.exercises[r.k]) id = topicOf({ ex: u.exercises[r.k], u, k: r.k });
+      else id = SKILLS.unitSkills(u.id)[0]?.id || `${u.id}:sec:0`;
+    }
+    if (!topicInfo(id)) continue;
+    const have = out.find(x => x.id === id);
+    if (have) { have.n += r.n || 1; have.last = [...have.last, ...(r.last || [])].slice(0, 3); }
+    else out.push({ id, u: u.id, n: r.n || 1, last: r.last || [], at: r.at || 0 });
+  }
+  data.review = out;
+}
+function trackReview(it, ok, info = {}) {
+  if (!it.u) return;
+  const id = topicOf(it); if (!id) return;
+  if (ok) return;
+  let r = data.review.find(x => x.id === id);
+  if (!r) data.review.push(r = { id, u: it.u.id, n: 0, last: [] });
+  r.n++; r.at = Date.now();
+  r.last = [{ q: promptOf(it.ex), you: String(info.you || ''), right: String(info.right || '') }, ...r.last].slice(0, 3);
   data.reviewAt = Date.now();
   save();
 }
-const replay = hash => `onclick="location.hash='${hash}';dispatchEvent(new HashChangeEvent('hashchange'));return false"`;
+// "Rifai": se siamo già su quella pagina, cambiare l'hash non fa nulla; quindi si ridisegna a mano
+const replay = () => 'data-replay';
+document.addEventListener('click', e => {
+  const a = e.target.closest('[data-replay]'); if (!a) return;
+  e.preventDefault();
+  const to = a.getAttribute('href');
+  if (location.hash === to) route(); else location.hash = to;
+});
+
+/* ---------- composizione delle sessioni ---------- */
+// n esercizi generati, un giro su tutte le regole e poi a caso, senza frasi ripetute
+function generated(skills, n, u, seen = new Set()) {
+  const out = [], order = shuffle(skills);
+  for (let k = 0, tries = 0; skills.length && out.length < n && tries < n * 15; tries++) {
+    const sk = k < order.length ? order[k++] : pick(skills);
+    const ex = SKILLS.make(sk.id); if (!ex) continue;
+    const key = ex.q || ex.it; if (seen.has(key)) continue;
+    seen.add(key); out.push({ ex, u, topic: sk.id });
+  }
+  return out;
+}
+function unitItems(u) {
+  const skills = SKILLS.unitSkills(u.id), a1 = u.level === 'A1';
+  // linea A1: quasi tutto generato, frasi sempre nuove; le altre linee: metà e metà
+  const nGen = !skills.length ? 0 : a1 ? 16 : 8, nHand = !skills.length ? 20 : a1 ? 4 : 12;
+  const hand = shuffle(u.exercises.map((ex, k) => ({ ex, u, k }))).slice(0, nHand);
+  const dict = shuffle(u.dict).slice(0, 2).map(t => ({ ex: { t: 'd', a: [t] }, u, topic: `${u.id}:dict` }));
+  return shuffle([...hand, ...generated(skills, nGen, u), ...dict]);
+}
+function topicItems(id, n = 8) {
+  const info = topicInfo(id), u = unitOf(info.u);
+  let items = [];
+  if (info.dict) items = shuffle(u.dict).slice(0, n).map(t => ({ ex: { t: 'd', a: [t] }, u, topic: id }));
+  else {
+    if (info.skill) items = generated([info.skill], info.skill ? n - 2 : 0, u);
+    const hand = u.exercises.map((ex, k) => ({ ex, u, k })).filter(it => topicOf(it) === id);
+    items.push(...shuffle(hand).slice(0, n - items.length).map(it => ({ ...it, topic: id })));
+    if (items.length < n && info.skill) items.push(...generated([info.skill], n - items.length, u, new Set(items.map(x => x.ex.q || x.ex.it))));
+    // una sezione senza regola generata e con pochi esercizi: si completa con le altre regole della fermata
+    if (items.length < n) items.push(...generated(SKILLS.unitSkills(u.id), n - items.length, u).map(x => ({ ...x, topic: id })));
+  }
+  return shuffle(items).slice(0, n);
+}
 
 function practiceUnit(u) {
   document.title = `Esercizi: ${plain(u.title)} — Brexli`;
-  // Ogni sessione è diversa: una parte degli esercizi scritti a mano, frasi nuove generate e qualche dettato
-  const hand = shuffle(u.exercises.map((ex, k) => ({ ex, u, k }))).slice(0, GEN[u.id] ? 12 : 20);
-  const made = [], seen = new Set();
-  for (let tries = 0; GEN[u.id] && made.length < 8 && tries < 60; tries++) {
-    const ex = GEN.make(u.id);
-    if (seen.has(ex.q)) continue;
-    seen.add(ex.q); made.push({ ex, u, g: ex.gen });
-  }
-  const dict = shuffle(u.dict).slice(0, 2).map(t => ({ ex: { t: 'd', a: [t] }, u, d: true }));
-  const items = shuffle([...hand, ...made, ...dict]);
   session({
-    items, back: `#/u/${u.id}`, line: LV_COLOR[u.level], onAnswer: trackReview,
+    items: unitItems(u), back: `#/u/${u.id}`, line: LV_COLOR[u.level], onAnswer: trackReview,
     onEnd: res => {
       const pct = Math.round(res.right / res.total * 100);
       data.units[u.id] = { best: Math.max(best(u), pct), last: pct, at: Date.now() };
@@ -801,36 +887,69 @@ function practiceUnit(u) {
       const next = UNITS[UNITS.indexOf(u) + 1];
       resultScreen(res, {
         num: u.n, line: LV_COLOR[u.level], title: `Fermata ${u.n}: ${plain(u.title)}`, passText: 'Fermata superata',
-        reviewNote: 'Questi esercizi sono finiti nel ripasso.',
         again: `${pct >= 80 && next ? `<a class="btn" href="#/u/${next.id}">Prossima fermata: ${next.stop}</a>` : `<a class="btn" href="#/u/${u.id}">Rileggi la lezione</a>`}
-                <a class="btn ghost" href="#/u/${u.id}/pratica" ${replay(`#/u/${u.id}/pratica`)}>Rifai gli esercizi</a>`,
+                <a class="btn ghost" href="#/u/${u.id}/pratica" ${replay()}>Rifai il test</a>`,
       });
     },
   });
 }
 
-function reviewPage(start) {
+/* ---------- pagina ripasso ---------- */
+function reviewPage(start, arg) {
   document.title = 'Ripasso — Brexli';
-  const list = data.review.filter(exerciseOf);
-  if (start === 'via' && list.length) {
-    const items = shuffle(list).slice(0, 15).map(reviewItem);
+  normalizeReview();
+  const list = data.review.filter(r => topicInfo(r.id)).sort((a, b) => b.n - a.n || b.at - a.at);
+  // esercitarsi su una regola sola
+  if (start === 't' && arg) {
+    const id = decodeURIComponent(arg), info = topicInfo(id); if (!info) return reviewPage();
+    const u = unitOf(info.u);
     return session({
-      items, back: '#/ripasso', line: 'var(--ink)', onAnswer: trackReview,
-      onEnd: res => resultScreen(res, { num: '↺', line: 'var(--ink)', title: 'Ripasso degli errori', reviewNote: 'Restano nel ripasso finché non li risolvi due volte di fila.',
-        again: data.review.length ? `<a class="btn" href="#/ripasso">Torna al ripasso</a>` : `<a class="btn" href="#/">Torna alla mappa</a>` }),
+      items: topicItems(id), back: '#/ripasso', line: LV_COLOR[u.level], onAnswer: trackReview,
+      onEnd: res => {
+        const pct = Math.round(res.right / res.total * 100), passed = pct >= 85;
+        if (passed) data.review = data.review.filter(r => r.id !== id);
+        data.reviewAt = Date.now(); save();
+        resultScreen(res, { num: u.n, line: LV_COLOR[u.level], title: `Ripasso: ${info.name}`, passText: 'Regola superata',
+          reviewNote: passed ? 'Questa regola esce dal ripasso.' : "Resta nel ripasso finché non arrivi all'85%.",
+          again: `<a class="btn ghost" href="#/ripasso/t/${encodeURIComponent(id)}" ${replay()}>Altre 8 domande</a> <a class="btn" href="#/ripasso">Torna al ripasso</a>` });
+      },
     });
   }
-  const byUnit = {};
-  list.forEach(r => { (byUnit[r.u] ||= []).push(r); });
+  // un po' di tutto: 2 domande per regola, partendo da quelle sbagliate più spesso
+  if (start === 'via' && list.length) {
+    const items = list.slice(0, 6).flatMap(r => topicItems(r.id, 2));
+    const stats = {};
+    return session({
+      items: shuffle(items), back: '#/ripasso', line: 'var(--ink)',
+      onAnswer: (it, ok, info) => { const id = topicOf(it); (stats[id] ||= { ok: 0, n: 0 }); stats[id].n++; if (ok) stats[id].ok++; trackReview(it, ok, info); },
+      onEnd: res => {
+        const solved = Object.entries(stats).filter(([, s]) => s.n >= 2 && s.ok === s.n).map(([id]) => id);
+        data.review = data.review.filter(r => !solved.includes(r.id));
+        data.reviewAt = Date.now(); save();
+        resultScreen(res, { num: '↺', line: 'var(--ink)', title: 'Ripasso misto',
+          reviewNote: solved.length ? `Regole superate (tutto giusto): ${solved.map(id => topicInfo(id)?.name).join(', ')}.` : 'Le regole restano nel ripasso finché non le fai tutte giuste.',
+          again: data.review.length ? `<a class="btn" href="#/ripasso">Torna al ripasso</a>` : `<a class="btn" href="#/">Torna alla mappa</a>` });
+      },
+    });
+  }
   app.innerHTML = `<section class="narrow">
     <div class="page-head">
       <h1>Ripasso</h1>
-      <p class="lede">Ogni esercizio sbagliato finisce qui, e ci resta finché non lo risolvi due volte di fila.</p>
+      <p class="lede">${list.length ? `Le regole su cui hai sbagliato. Per ognuna trovi la spiegazione, i tuoi errori e domande nuove per esercitarti: quando ne fai giuste almeno l'85%, la regola esce dal ripasso.` : 'Qui compaiono le regole su cui sbagli, con la spiegazione e domande nuove per esercitarti.'}</p>
     </div>
-    ${list.length ? `<p style="margin-top:22px"><a class="btn" href="#/ripasso/via">Ripassa ${Math.min(15, list.length)} esercizi</a></p>
-      <ul class="review-list">${Object.entries(byUnit).map(([id, rs]) => { const u = UNITS.find(x => x.id === id); return `<li><a href="#/u/${id}"><span class="n" style="background:${LV_COLOR[u.level]}">${u.n}</span><b>${u.stop} <small style="font-weight:400;color:var(--muted)">linea ${u.level}</small></b><span>${rs.length} da ripassare</span></a></li>`; }).join('')}</ul>`
-    : `<p class="empty">Nessun errore in sospeso. Quando sbagli un esercizio, lo ritrovi qui.</p><a class="btn" href="#/">Torna alla mappa</a>`}
+    ${list.length ? `<p style="margin-top:22px"><a class="btn" href="#/ripasso/via">Ripassa un po' di tutto</a></p>
+      <div class="topics">${list.map(r => {
+        const info = topicInfo(r.id), u = unitOf(info.u);
+        return `<article class="topic" style="--line:${LV_COLOR[u.level]}">
+          <div class="tmeta"><span class="n">${u.n}</span>Linea ${u.level}, ${u.stop} <span class="cnt">${r.n} ${r.n === 1 ? 'errore' : 'errori'}</span></div>
+          <h2>${info.name}</h2>
+          <p class="trule">${info.rule}</p>
+          ${r.last.length ? `<ul class="tlast">${r.last.map(m => `<li><span class="tq">${esc(m.q)}</span>${m.you ? `<span class="${/^\(/.test(m.you) ? 'idk' : 'you'}">${/^\(/.test(m.you) ? 'non lo sapevi' : esc(m.you)}</span>` : ''}<span class="ok">${esc(m.right)}</span></li>`).join('')}</ul>` : ''}
+          <div class="tact"><a class="btn" href="#/ripasso/t/${encodeURIComponent(r.id)}">Esercitati: 8 domande</a><button class="link" type="button" data-topic-help="${esc(r.id)}">Rileggi la spiegazione</button></div>
+        </article>`; }).join('')}</div>`
+    : `<p class="empty">Nessuna regola da ripassare. Quando sbagli un esercizio, la sua regola compare qui.</p><a class="btn" href="#/">Torna alla mappa</a>`}
   </section>`;
+  $$('[data-topic-help]').forEach(b => b.onclick = () => { const info = topicInfo(b.dataset.topicHelp); openHelp({ u: unitOf(info.u) }, info.sec); });
 }
 routes.ripasso = reviewPage;
 
@@ -907,6 +1026,7 @@ function irregularDrill() {
   });
 }
 
+normalizeReview();
 updateCount();
 updateNav();
 route();

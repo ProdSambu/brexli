@@ -1,16 +1,17 @@
-// Genera gli MP3 di tutte le frasi inglesi del corso con Piper (voce en_GB "cori").
-// Uso: PIPER=…/piper.exe MODEL=…/en_GB-cori-high.onnx LAMEJS_DIR=…/enc node tools/build-audio.mjs
+// Genera gli MP3 di tutte le frasi inglesi del corso con Kokoro (voce americana maschile "am_michael").
+// Uso: KOKORO_DIR=…/kokoro LAMEJS_DIR=…/enc node tools/build-audio.mjs   (FORCE=1 per rifarli tutti)
 // Crea audio/<hash>.mp3 e js/audio-manifest.js; le frasi già generate vengono saltate.
 import fs from 'fs';
 import path from 'path';
 import vm from 'vm';
-import { spawn } from 'child_process';
 import { pathToFileURL } from 'url';
 
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Z]:)/, '$1')), '..');
-const { PIPER, MODEL, LAMEJS_DIR } = process.env;
-if (!PIPER || !MODEL || !LAMEJS_DIR) throw new Error('Servono PIPER, MODEL e LAMEJS_DIR');
+const { KOKORO_DIR, LAMEJS_DIR, FORCE } = process.env;
+const VOICE = process.env.VOICE || 'am_michael';
+if (!KOKORO_DIR || !LAMEJS_DIR) throw new Error('Servono KOKORO_DIR e LAMEJS_DIR');
 const lame = await import(pathToFileURL(path.join(LAMEJS_DIR, 'node_modules/@breezystack/lamejs/dist/lamejs.js')).href);
+const { KokoroTTS } = await import(pathToFileURL(path.join(KOKORO_DIR, 'node_modules/kokoro-js/dist/kokoro.js')).href);
 
 // ---- carica i contenuti come fa il browser ----
 const ctx = { console }; ctx.window = ctx; vm.createContext(ctx);
@@ -35,46 +36,34 @@ for (const v of VERBS.IRR) texts.add(`${v.b}, ${v.p1}, ${v.pp1}`);
 const outDir = path.join(root, 'audio');
 fs.mkdirSync(outDir, { recursive: true });
 const items = [...texts].filter(Boolean).map(t => ({ t, k: speechKey(t) }));
-const todo = items.filter(i => !fs.existsSync(path.join(outDir, `${i.k}.mp3`)));
-console.log(`${items.length} frasi, da generare: ${todo.length}`);
+const todo = items.filter(i => FORCE || !fs.existsSync(path.join(outDir, `${i.k}.mp3`)));
+console.log(`${items.length} frasi, da generare: ${todo.length} (voce ${VOICE})`);
 
-// ---- Piper: un solo processo, una riga JSON per frase ----
-const tmp = path.join(root, 'audio', '.wav');
-fs.mkdirSync(tmp, { recursive: true });
-// i WAV rimasti da un giro interrotto non si rigenerano
-const toSynth = todo.filter(i => !fs.existsSync(path.join(tmp, `${i.k}.wav`)));
-console.log(`da sintetizzare con Piper: ${toSynth.length}`);
-if (toSynth.length) {
-  await new Promise((resolve, reject) => {
-    const p = spawn(PIPER, ['--model', MODEL, '--json-input', '--sentence_silence', '0.15', '--length_scale', '1.05'], { stdio: ['pipe', 'ignore', 'inherit'] });
-    p.on('error', reject);
-    p.on('close', code => code === 0 ? resolve() : reject(new Error('piper exit ' + code)));
-    for (const i of toSynth) p.stdin.write(JSON.stringify({ text: i.t, output_file: path.join(tmp, `${i.k}.wav`) }) + '\n');
-    p.stdin.end();
-  });
-}
-
-// ---- WAV → MP3 mono 40 kbps ----
-let bytes = 0;
+// ---- Kokoro → PCM 16 bit → MP3 mono 48 kbps ----
+const tts = todo.length ? await KokoroTTS.from_pretrained('onnx-community/Kokoro-82M-v1.0-ONNX', { dtype: 'fp32', device: 'cpu' }) : null;
+let bytes = 0, done = 0;
 for (const i of todo) {
-  const wav = path.join(tmp, `${i.k}.wav`);
-  const buf = fs.readFileSync(wav);
-  const sr = buf.readUInt32LE(24), off = buf.indexOf('data') + 8;
-  const n = Math.floor((buf.length - off) / 2);
-  const pcm = new Int16Array(n);
-  for (let j = 0; j < n; j++) pcm[j] = buf.readInt16LE(off + j * 2);
-  const enc = new lame.Mp3Encoder(1, sr, 40);
+  // Kokoro legge meglio le parole isolate con un punto finale ("go." invece di "go")
+  const say = /[.?!]$/.test(i.t) ? i.t : `${i.t}.`;
+  const audio = await tts.generate(say, { voice: VOICE, speed: 0.92 });
+  const f = audio.audio, sr = audio.sampling_rate;
+  // un filo di silenzio all'inizio e alla fine, così la prima sillaba non viene tagliata
+  const pad = Math.round(sr * 0.08);
+  const pcm = new Int16Array(f.length + pad * 2);
+  for (let j = 0; j < f.length; j++) pcm[j + pad] = Math.max(-32768, Math.min(32767, Math.round(f[j] * 32767)));
+  const enc = new lame.Mp3Encoder(1, sr, 48);
   const parts = [];
   for (let j = 0; j < pcm.length; j += 1152) { const b = enc.encodeBuffer(pcm.subarray(j, j + 1152)); if (b.length) parts.push(Buffer.from(b)); }
   parts.push(Buffer.from(enc.flush()));
   const mp3 = Buffer.concat(parts);
   fs.writeFileSync(path.join(outDir, `${i.k}.mp3`), mp3);
   bytes += mp3.length;
-  fs.unlinkSync(wav);
+  if (++done % 100 === 0) console.log(`${done}/${todo.length}`);
 }
-fs.rmSync(tmp, { recursive: true, force: true });
 
-// ---- manifest: quali frasi hanno un file ----
-const keys = items.map(i => i.k).filter(k => fs.existsSync(path.join(outDir, `${k}.mp3`))).sort();
-fs.writeFileSync(path.join(root, 'js/audio-manifest.js'), `// Generato da tools/build-audio.mjs: frasi con un MP3 in audio/\nwindow.AUDIO_KEYS = new Set(${JSON.stringify(keys)});\n`);
-console.log(`fatto: ${todo.length} nuovi file (${(bytes / 1e6).toFixed(1)} MB), ${keys.length} nel manifest`);
+// ---- manifest: quali frasi hanno un file; i file che non servono più vengono tolti ----
+const keys = new Set(items.map(i => i.k));
+for (const f of fs.readdirSync(outDir)) if (f.endsWith('.mp3') && !keys.has(f.slice(0, -4))) fs.unlinkSync(path.join(outDir, f));
+const present = [...keys].filter(k => fs.existsSync(path.join(outDir, `${k}.mp3`))).sort();
+fs.writeFileSync(path.join(root, 'js/audio-manifest.js'), `// Generato da tools/build-audio.mjs: frasi con un MP3 in audio/ (voce ${VOICE}, Kokoro)\nwindow.AUDIO_KEYS = new Set(${JSON.stringify(present)});\n`);
+console.log(`fatto: ${done} file nuovi (${(bytes / 1e6).toFixed(1)} MB), ${present.length} nel manifest`);

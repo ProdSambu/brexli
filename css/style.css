@@ -439,3 +439,32 @@ mark.mr { background: color-mix(in srgb, var(--ok) 20%, transparent); font-weigh
   .cmprow { grid-template-columns: 1fr; gap: 0; }
   .cmprow .txt { font-size: 19px; }
 }
+
+/* ---------- correzione: il tuo errore e la regola ---------- */
+.fb .lab { display: block; font-size: 13px; font-weight: 600; letter-spacing: .01em; color: var(--muted); margin-bottom: 2px; }
+.fb .mine { margin: 12px 0 6px; padding: 12px 14px; border-radius: 10px; background: var(--paper); border: 1.5px solid color-mix(in srgb, var(--no) 45%, transparent); font-size: 17px; line-height: 1.5; }
+.fb .mine .lab { color: var(--no); }
+.fb .mine b { color: var(--ink); }
+.fb .rule { margin-top: 14px; padding-top: 12px; border-top: 1px solid color-mix(in srgb, var(--ink) 15%, transparent); font-size: 16px; line-height: 1.5; color: var(--ink); max-width: 40em; }
+.fb .rule .link { margin-top: 8px; display: inline-block; font-size: 15px; }
+
+/* ---------- ripasso per regole ---------- */
+.topics { display: grid; gap: 16px; margin-top: 26px; }
+.topic { border: 1.5px solid var(--rail); border-left: 8px solid var(--line); border-radius: 12px; padding: 16px 18px 18px; }
+.tmeta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 14px; color: var(--muted); }
+.tmeta .n { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: var(--line); color: #fff; font-weight: 600; font-size: 13px; }
+.tmeta .cnt { margin-left: auto; background: color-mix(in srgb, var(--no) 14%, transparent); color: var(--no); font-weight: 600; padding: 1px 10px; border-radius: 999px; }
+.topic h2 { margin: 6px 0 6px; font-size: 22px; }
+.trule { margin: 0; color: var(--ink); font-size: 16px; line-height: 1.5; }
+.tlast { list-style: none; padding: 0; margin: 12px 0 0; display: grid; gap: 6px; }
+.tlast li { display: flex; flex-wrap: wrap; gap: 2px 10px; font-size: 16px; align-items: baseline; padding: 6px 0; border-top: 1px dashed var(--rail); }
+.tlast .tq { flex-basis: 100%; color: var(--muted); font-size: 14px; }
+.tlast .you, .mistakes .you { color: var(--no); text-decoration: line-through; }
+.tlast .ok { color: var(--ok); font-weight: 600; }
+.tact { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; margin-top: 14px; }
+.rules-todo { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 8px; }
+.rules-todo li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; border-radius: 10px; background: var(--panel); }
+.rules-todo b { display: block; }
+.rules-todo span { font-size: 14px; color: var(--muted); }
+.rules-todo .btn { padding: 9px 16px; font-size: 15px; flex: none; }
+.tlast .idk { color: var(--muted); font-style: italic; }

@@ -350,5 +350,5 @@
     return t || null;
   }
 
-  window.EXPLAIN = { analyze, irregular, typo, typoWord, tokens, diff };
+  window.EXPLAIN = { analyze, irregular, typo, typoWord, tokens, diff, spelling: spellingNote, lexicon: () => lexicon() };
 })();
