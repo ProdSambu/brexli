@@ -1,6 +1,6 @@
 // Regole e generatori della linea A1, fermate 1-6.
 (() => {
-  const { pick, shuffle, cap, uniq, V, SUBJ, SUBJ_TR, is3, enSubj, subjDesc, BE, beShort, IT, ACT, ACT_TR, T_PRES, itSentence, itPres, enVariants, kindOf, has } = LEX;
+  const { pick, shuffle, cap, uniq, V, SUBJ, SUBJ_TR, is3, enSubj, subjDesc, BE, beShort, IT, ACT, ACT_TR, T_PRES, itSentence, itPres, enVariants, kindOf, has, glS, glA, glT, gloss } = LEX;
   const { add, F, b, words, lastWord, dPresent, dBaseAfter, numWords, spellingHint } = SKILLS;
   const coin = (p = 0.5) => Math.random() < p;
   const contr = (s, be) => s.en === 'I' ? "I'm" : `${s.en}${beShort[be]}`;
@@ -35,7 +35,7 @@
         return F.fix(`${enSubj(s, 1)} ${wrong} ${c[0]}.`, `${enSubj(s, 1)} ${be} ${c[0]}.`, { why: beWhy(s) });
       }
       const ss = pick(SUBJ_TR);
-      return F.tr(itSentence(ss, IT.essere[ss.p], itC(c, ss)), [`${enSubj(ss, 1)} ${BE[ss.p]} ${c[0]}.`], { why: beWhy(ss) });
+      return F.tr(itSentence(ss, IT.essere[ss.p], itC(c, ss)), [`${enSubj(ss, 1)} ${BE[ss.p]} ${c[0]}.`], { why: beWhy(ss), gl: gloss(glS(ss), [[itC(c, ss), c[0]]]) });
     });
 
   add('a1-01', 'be-neg-q', ['Forma negativa', 'Domande e risposte brevi'], 'Be: negativa, domande e risposte brevi',
@@ -47,8 +47,8 @@
       if (m === 'neg') return F.fill(`${enSubj(s, 1)} ___ ${c[0]}.`, neg, 'be, negativa', { why: 'La negativa di be: be + not. Con I solo I\'m not (amn\'t non esiste).' });
       if (m === 'q') return F.fill(`___ ${s.en} ${c[0]}?`, [cap(be)], null, { why: `Nella domanda il verbo va prima del soggetto: ${cap(be)} ${s.en} ${c[0]}?`, diag: x => /^(do|does)$/i.test(x.trim()) ? `Be non usa do / does: fa la domanda da solo, mettendosi prima del soggetto. ${beWhy(s)}` : dBe(s, x) });
       const ss = pick(SUBJ_TR), bb = BE[ss.p];
-      if (m === 'trneg') return F.tr(itSentence(ss, IT.essere[ss.p], itC(c, ss), '', { neg: true }), [`${enSubj(ss, 1)} ${bb} not ${c[0]}.`], { why: 'Negativa: be + not.' });
-      if (m === 'trq') return F.tr(itSentence(ss, IT.essere[ss.p], itC(c, ss), '', { q: true }), [`${cap(bb)} ${ss.en} ${c[0]}?`], { why: 'In italiano la domanda si riconosce dal tono; in inglese il verbo be passa davanti al soggetto.' });
+      if (m === 'trneg') return F.tr(itSentence(ss, IT.essere[ss.p], itC(c, ss), '', { neg: true }), [`${enSubj(ss, 1)} ${bb} not ${c[0]}.`], { why: 'Negativa: be + not.', gl: gloss(glS(ss), [[itC(c, ss), c[0]]]) });
+      if (m === 'trq') return F.tr(itSentence(ss, IT.essere[ss.p], itC(c, ss), '', { q: true }), [`${cap(bb)} ${ss.en} ${c[0]}?`], { why: 'In italiano la domanda si riconosce dal tono; in inglese il verbo be passa davanti al soggetto.', gl: gloss(glS(ss), [[itC(c, ss), c[0]]]) });
       if (m === 'fix') {
         if (coin()) return F.fix(`${cap(LEX.is3(s) ? 'does' : 'do')} ${s.en} ${be === 'am' ? 'are' : be} ${c[0]}?`.replace(/^Do I are/, 'Do I am'), `${cap(be)} ${s.en} ${c[0]}?`, { why: 'Be non usa do / does: nella domanda si mette solo prima del soggetto.' });
         return F.fix(`${enSubj(s, 1)} not ${be} ${c[0]}.`, `${enSubj(s, 1)} ${be} not ${c[0]}.`, { why: 'Not va dopo be: I am not, she is not, they are not.' });
@@ -71,13 +71,13 @@
         const n = 12 + Math.floor(Math.random() * 60), it = `${n} anni`;
         const acc = [`${enSubj(s, 1)} ${be} ${n}.`, `${enSubj(s, 1)} ${be} ${n} years old.`, `${enSubj(s, 1)} ${be} ${numWords(n)}.`, `${enSubj(s, 1)} ${be} ${numWords(n)} years old.`];
         if (m === 'fix') return F.fix(`${enSubj(s, 1)} ${LEX.is3(s) ? 'has' : 'have'} ${n} years.`, acc, { why: "L'età si dice con be: I'm 20 (oppure I'm 20 years old)." });
-        return F.tr(itSentence(s, IT.avere[s.p], it), acc, { why: "L'età si dice con be: I'm 20, I'm 20 years old. Mai have.", diag: dHave });
+        return F.tr(itSentence(s, IT.avere[s.p], it), acc, { why: "L'età si dice con be: I'm 20, I'm 20 years old. Mai have.", diag: dHave, gl: gloss(glS(s)) });
       }
       const [itw, en, alt] = pick(AVERE), neg = coin(0.3);
       const accs = [en, ...(alt || [])].map(e => `${enSubj(s, 1)} ${be}${neg ? ' not' : ''} ${e}.`);
       if (m === 'fix') return F.fix(`${enSubj(s, 1)} ${LEX.is3(s) ? 'has' : 'have'} ${en === 'in a hurry' ? 'hurry' : en}.`.replace(/ have (right|wrong|cold|hot)/, ' have $1'), accs.map(a => a.replace(' not', '')), { why: `"Avere ${itw}" in inglese è be ${en}.` });
       if (m === 'choice') return F.choice(`${enSubj(s, 1)} ___ ${en}.`, uniq([be, LEX.is3(s) ? 'has' : 'have', 'is', 'are']).slice(0, 3).concat(uniq([be])).filter((x, i, a) => a.indexOf(x) === i), be, { why: `"Avere ${itw}" in inglese si dice con be: ${be} ${en}.`, diag: dHave });
-      return F.tr(itSentence(s, IT.avere[s.p], itw, '', { neg }), accs, { why: `"Avere ${itw}" in inglese si dice con be: ${be} ${en}.`, diag: dHave });
+      return F.tr(itSentence(s, IT.avere[s.p], itw, '', { neg }), accs, { why: `"Avere ${itw}" in inglese si dice con be: ${be} ${en}.`, diag: dHave, gl: gloss(glS(s), [[itw, en]]) });
     });
 
   const IT_EXPR = [['Fa freddo', 'cold'], ['Fa caldo', 'hot'], ['È tardi', 'late'], ['È presto', 'early'], ['È importante', 'important'],
@@ -93,7 +93,7 @@
       const acc = ends.flatMap(e => dEn ? [`It's ${e} ${dEn}.`, `${cap(dEn)} it's ${e}.`] : [`It's ${e}.`]);
       const diag = x => !/\bit\b|it's/i.test(x) ? `Manca il soggetto. In italiano "${it.toLowerCase()}" non ha soggetto, ma in inglese ci vuole sempre: per tempo, ore e giudizi si usa ${b('it')} (It's ${en}).` : null;
       if (coin(0.35)) return F.fix(`Is ${en}${dEn ? ' ' + dEn : ''}.`, acc, { why: 'Il soggetto non si omette: per il tempo, le ore e i giudizi si usa it.' });
-      return F.tr(`${it}${dIt ? ' ' + dIt : ''}.`, acc, { why: 'Il soggetto non si omette: per il tempo, le ore e i giudizi il soggetto è it.', diag });
+      return F.tr(`${it}${dIt ? ' ' + dIt : ''}.`, acc, { why: 'Il soggetto non si omette: per il tempo, le ore e i giudizi il soggetto è it.', diag, gl: gloss([[it.replace(/^(Fa|È|Sono) /, ''), en]], dIt ? [[dIt, dEn]] : []) });
     });
 
   /* =================== A1-02: articoli, plurali, this / that =================== */
@@ -113,7 +113,7 @@
       if (coin(0.35)) {
         const [art, job, it] = pick(JOBS), s = pick(SUBJ_TR.filter(x => is3(x)));
         const diag = x => !/\b(a|an)\b/i.test(x) ? `In italiano "è ${it}" non ha articolo, ma in inglese con le professioni serve sempre: ${s.en} is ${b(art)} ${job}.` : null;
-        return coin() ? F.tr(itSentence(s, 'è', it), [`${enSubj(s, 1)} is ${art} ${job}.`], { why: 'Con le professioni in inglese serve sempre a / an.', diag })
+        return coin() ? F.tr(itSentence(s, 'è', it), [`${enSubj(s, 1)} is ${art} ${job}.`], { why: 'Con le professioni in inglese serve sempre a / an.', diag, gl: gloss(glS(s), [[it, job]]) })
           : F.fix(`${enSubj(s, 1)} is ${job}.`, [`${enSubj(s, 1)} is ${art} ${job}.`], { why: 'Con le professioni in inglese serve sempre a / an.' });
       }
       const [art, noun, tag] = pick(A_AN);
@@ -140,7 +140,7 @@
       const [vb, itForms] = pick(LOVE.filter(l => l[1])), s = pick(SUBJ_TR), v = V(vb);
       const form = is3(s) ? v.third : v.b;
       const accs = [n, ...(nalt || [])].map(x => `${enSubj(s, 1)} ${form} ${x}.`);
-      return F.tr(itSentence(s, itForms.split(' ')[s.p], nit), accs, { why: `Si parla di ${n} in generale: in italiano c'è l'articolo (${nit}), in inglese no.`,
+      return F.tr(itSentence(s, itForms.split(' ')[s.p], nit), accs, { why: `Si parla di ${n} in generale: in italiano c'è l'articolo (${nit}), in inglese no.`, gl: gloss(glS(s), [[vb === 'love' ? 'amare' : 'odiare', vb], [nit.replace(/^(il|lo|la|i|gli|le|l') ?/, ''), n]]),
         diag: x => new RegExp(`\\bthe ${n}\\b`, 'i').test(x) ? `In italiano si dice "${nit}", ma in inglese, quando si parla in generale, l'articolo non si mette: ${form} ${b(n)}, non ${form} the ${n}.` : null });
     });
 
@@ -198,7 +198,7 @@
       const why = `Il possessore è ${b(o)}${g === 'm' ? ', un uomo' : g === 'f' ? ', una donna' : ', più persone'}: quindi ${b(poss)}, qualunque sia la cosa (${th[0]}).`;
       const diag = x => { const w = words(x).find(y => ['his', 'her', 'their', 'its'].includes(y)); return w && w !== poss ? `${why} In italiano "${g === 'p' ? th[2] : th[1]}" si accorda con ${th[0]}, in inglese no.` : null; };
       if (coin(0.5)) return F.choice(`${cap(o)} ${verb} ___ ${th[0]}.`, ['his', 'her', 'their', 'its'], poss, { why, diag });
-      return F.tr(`${cap(oit || o)} ${itVerb} ${g === 'p' ? th[2] : th[1]}.`, [`${cap(o)} ${verb} ${poss} ${th[0]}.`], { why, diag });
+      return F.tr(`${cap(oit || o)} ${itVerb} ${g === 'p' ? th[2] : th[1]}.`, [`${cap(o)} ${verb} ${poss} ${th[0]}.`], { why, diag, gl: gloss(oit ? [[oit, o]] : [], [['amare', 'love'], [(g === 'p' ? th[2] : th[1]).split(' ').pop(), th[0]]]) });
     });
 
   const PRONS = [['me', 'mine', 'mio', 'mia', 'miei', 'mie'], ['you', 'yours', 'tuo', 'tua', 'tuoi', 'tue'], ['him', 'his', 'di lui'], ['her', 'hers', 'di lei'], ['us', 'ours', 'nostro', 'nostra', 'nostri', 'nostre'], ['them', 'theirs', 'loro']];
@@ -212,7 +212,7 @@
       const diag = x => /\bthe\b/i.test(x) ? `Il pronome possessivo non vuole l'articolo: ${b(pron)}, non the ${pron}.` : /\b(my|your|our|their)\b/i.test(lastWord(x)) ? `${b(lastWord(x))} va sempre davanti a un nome (my book); da solo serve il pronome: ${b(pron)}.` : null;
       if (coin(0.4)) return F.fill(`This ${n.replace(/s$/, '')} belongs to ${obj}. It's ___.`.replace('This keys', 'This key').replace('This shoe', 'This shoe'), [pron], null, { why, diag });
       const en = `${pl ? 'These' : 'This'} ${n} ${be} ${pron}.`;
-      return F.tr(`${nit} ${pl ? 'sono' : 'è'} ${itPron}.`, [en], { why, diag });
+      return F.tr(`${nit} ${pl ? 'sono' : 'è'} ${itPron}.`, [en], { why, diag, gl: gloss([[nit.split(' ').pop(), n]]) });
     });
 
   const GOWN = [['father', 'di mio padre'], ['mother', 'di mia madre'], ['brother', 'di mio fratello'], ['sister', 'di mia sorella'], ['parents', 'dei miei genitori'], ['friends', 'dei miei amici'], ['children', 'dei miei figli', ['kids']], ['boss', 'del mio capo']];
@@ -227,7 +227,7 @@
       const m = pick(['fill', 'fix', 'tr']);
       if (m === 'fill') return F.fill(`It's my ___ ${th}.`, [g], `${thit.toLowerCase()} ${oit}`, { why, diag: x => lastWord(x) === o + 's' && /'$/.test(g) ? `${why}` : diag(x) });
       if (m === 'fix') return F.fix(`The ${th} of my ${o} ${pred}.`, [`My ${g} ${th} ${pred}.`], { why: "Con le persone si usa il genitivo sassone: my father's car, non the car of my father." });
-      return F.tr(`${thit} ${oit} ${predIt}.`, [`My ${g} ${th} ${pred}.`], { why, diag });
+      return F.tr(`${thit} ${oit} ${predIt}.`, [`My ${g} ${th} ${pred}.`], { why, diag, gl: gloss([[thit.replace(/^(il|lo|la|l') ?/i, '').toLowerCase(), th], [oit.split(' ').pop(), o], [predIt.replace(/^è /, ''), pred.replace(/^is /, '')]]) });
     });
 
   const GOT = [['two sisters', 'due sorelle'], ['a dog', 'un cane'], ['a new car', 'una macchina nuova'], ['blue eyes', 'gli occhi azzurri'], ['a cold', 'il raffreddore'], ['three children', 'tre figli', ['three kids']], ['a big garden', 'un giardino grande'], ['a brother', 'un fratello']];
@@ -244,7 +244,7 @@
       const ss = pick(SUBJ_TR), hh = is3(ss) ? 'has' : 'have', d = is3(ss) ? 'does' : 'do';
       const objs = [x, ...(xalt || [])];
       const acc = objs.flatMap(o => [`${enSubj(ss, 1)} ${hh} got ${o}.`, `${enSubj(ss, 1)} ${hh} ${o}.`]);
-      return F.tr(itSentence(ss, IT.avere[ss.p], xit), acc, { why: `"Avere" qui è ${hh} got (oppure ${hh} da solo).`, diag: x2 => /\b(am|is|are)\b/i.test(x2) ? `Qui avere indica possesso: ${b(hh + ' got')} (o ${hh}), non be.` : null });
+      return F.tr(itSentence(ss, IT.avere[ss.p], xit), acc, { why: `"Avere" qui è ${hh} got (oppure ${hh} da solo).`, gl: gloss(glS(ss), [[xit, x]]), diag: x2 => /\b(am|is|are)\b/i.test(x2) ? `Qui avere indica possesso: ${b(hh + ' got')} (o ${hh}), non be.` : null });
     });
 
   /* =================== A1-04: present simple affermativo =================== */
@@ -260,7 +260,7 @@
       if (m === 'fix') return F.fix(`${enSubj(s, 1)} ${is3(s) ? v.b : v.third} ${a.rest} ${t[0]}.`, [`${enSubj(s, 1)} ${form} ${a.rest} ${t[0]}.`], { why });
       const aa = pick(ACT_TR), ss = pick(SUBJ_TR), f2 = is3(ss) ? aa.v.third : aa.v.b;
       const acc = enVariants(ss, f2, aa, t, { altVerb: vb => is3(ss) ? vb.third : vb.b });
-      const tr = F.tr(itSentence(ss, itPres(aa, ss), aa.itRest, t[1]), acc, { why: presWhy(ss, aa.v), diag: x => dPresent(ss, aa.v, words(x).find(w => kindOf(w, aa.v)[0] !== 'other') || x, t[0]) });
+      const tr = F.tr(itSentence(ss, itPres(aa, ss), aa.itRest, t[1]), acc, { why: presWhy(ss, aa.v), gl: gloss(glS(ss), glA(aa), glT(t)), diag: x => dPresent(ss, aa.v, words(x).find(w => kindOf(w, aa.v)[0] !== 'other') || x, t[0]) });
       if (m === 'ord') return { ...tr, t: 'o', a: [acc[0], ...acc.slice(1)] , d: [is3(ss) ? aa.v.b : aa.v.third] };
       return tr;
     });
@@ -314,12 +314,13 @@
       }
       const aa = pick(ACT_TR), ss = pick(SUBJ_TR), dd = is3(ss) ? 'does' : 'do';
       const acc = enVariants(ss, `${dd}n't ${aa.v.b}`, aa, null, { altVerb: vb => `${dd}n't ${vb.b}` });
-      return F.tr(itSentence(ss, itPres(aa, ss), aa.itRest, '', { neg: true }), acc, { why: negWhy(ss), diag: x => dNeg(ss, aa.v, x.split(/\s+/).slice(0, 4).join(' ')) });
+      return F.tr(itSentence(ss, itPres(aa, ss), aa.itRest, '', { neg: true }), acc, { why: negWhy(ss), gl: gloss(glS(ss), glA(aa)), diag: x => dNeg(ss, aa.v, x.split(/\s+/).slice(0, 4).join(' ')) });
     });
 
   const WH = [['work', 'Dove', 'Where', 'lavora lavori lavora lavoriamo lavorate lavorano'], ['live', 'Dove', 'Where', 'abito abiti abita abitiamo abitate abitano'],
     ['study', 'Cosa', 'What', 'studio studi studia studiamo studiate studiano'], ['eat', 'Cosa', 'What', 'mangio mangi mangia mangiamo mangiate mangiano'],
-    ['drink', 'Cosa', 'What', 'bevo bevi beve beviamo bevete bevono'], ['get up', 'A che ora', 'What time', 'mi alzo ti alzi si alza ci alziamo vi alzate si alzano']];
+    ['drink', 'Cosa', 'What', 'bevo bevi beve beviamo bevete bevono'], ['get up', 'A che ora', 'What time', 'mi alzo,ti alzi,si alza,ci alziamo,vi alzate,si alzano']];
+  const WH_INF = { work: 'lavorare', live: 'abitare', study: 'studiare', eat: 'mangiare', drink: 'bere', 'get up': 'alzarsi' };
   function dQuestion(s, v, x) {
     // il primo do / does della frase è l'ausiliare; un "do" che viene dopo è il verbo (do the shopping)
     const ws = words(x), d = is3(s) ? 'does' : 'do', i = ws.findIndex(w => w === 'do' || w === 'does');
@@ -342,12 +343,13 @@
       }
       if (m === 'trwh') {
         const [vb, itWh, enWh, itForms] = pick(WH), ss = pick(SUBJ_TR.filter(x => x.p !== 0)), dd = is3(ss) ? 'does' : 'do';
-        const itV = itForms.split(' ')[ss.p], it = ss.it ? `${itWh} ${itV} ${ss.it}?` : `${itWh} ${itV}?`;
-        return F.tr(cap(it), [`${enWh} ${dd} ${ss.en} ${vb}?`], { why: `Domanda: ${enWh} + ${dd} + soggetto + verbo base.`, diag: x => dQuestion(ss, V(vb.split(' ')[0]), x) });
+        // i riflessivi (mi alzo) sono separati da virgole, gli altri da spazi
+        const itV = itForms.split(itForms.includes(',') ? ',' : ' ')[ss.p], it = ss.it ? `${itWh} ${itV} ${ss.it}?` : `${itWh} ${itV}?`;
+        return F.tr(cap(it), [`${enWh} ${dd} ${ss.en} ${vb}?`], { why: `Domanda: ${enWh} + ${dd} + soggetto + verbo base.`, gl: gloss(glS(ss), [[itWh.toLowerCase(), enWh.toLowerCase()], [WH_INF[vb], vb]]), diag: x => dQuestion(ss, V(vb.split(' ')[0]), x) });
       }
       const aa = pick(ACT_TR), ss = pick(SUBJ_TR), dd = is3(ss) ? 'does' : 'do';
       const acc = uniq([aa.rest, ...aa.alt].map(r => `${cap(dd)} ${ss.en} ${aa.v.b} ${r}?`).concat(aa.trAlt.map(([vb, r]) => `${cap(dd)} ${ss.en} ${vb} ${r}?`)));
-      return F.tr(itSentence(ss, itPres(aa, ss), aa.itRest, '', { q: true }), acc, { why: `Domanda: ${cap(dd)} + soggetto + verbo base.`, diag: x => dQuestion(ss, aa.v, x) });
+      return F.tr(itSentence(ss, itPres(aa, ss), aa.itRest, '', { q: true }), acc, { why: `Domanda: ${cap(dd)} + soggetto + verbo base.`, gl: gloss(glS(ss), glA(aa)), diag: x => dQuestion(ss, aa.v, x) });
     });
 
   const ADV = [['always', 'sempre'], ['usually', 'di solito'], ['often', 'spesso'], ['sometimes', 'a volte'], ['never', 'mai']];
@@ -361,7 +363,7 @@
         const right = `${enSubj(s, 1)} ${be} ${en} ${adj}.`;
         const itS = en === 'never' ? itSentence(s, `${IT.essere[s.p]} mai`, ia, '', { neg: true }) : en === 'usually' ? cap(`di solito ${s.it ? s.it + ' ' : ''}${IT.essere[s.p]} ${ia}.`) : itSentence(s, `${IT.essere[s.p]} ${it}`, ia);
         const why = `Con be l'avverbio va dopo il verbo: ${s.en} ${be} ${b(en)} ${adj}.`;
-        return coin() ? F.fix(`${enSubj(s, 1)} ${en} ${be} ${adj}.`, [right], { why }) : F.tr(itS, [right], { why });
+        return coin() ? F.fix(`${enSubj(s, 1)} ${en} ${be} ${adj}.`, [right], { why }) : F.tr(itS, [right], { why, gl: gloss(glS(s), [[it, en], [ia, adj]]) });
       }
       const a = pick(ACT_TR), f = is3(s) ? a.v.third : a.v.b;
       const right = [a.rest, ...a.alt].map(r => `${enSubj(s, 1)} ${en} ${f} ${r}.`);
@@ -375,7 +377,7 @@
       const diag = x => en === 'never' && /n't|\bnot\b/i.test(x) ? `${b('never')} è già negativo: in inglese una sola negazione, quindi ${s.en} never ${f} …, senza don't.` : null;
       const m = pick(['tr', 'ord', 'fix']);
       if (m === 'fix') return F.fix(`${enSubj(s, 1)} ${f} ${en} ${a.rest}.`, right, { why });
-      return { ...F.tr(itS, right, { why, diag }), ...(m === 'ord' ? { t: 'o' } : {}) };
+      return { ...F.tr(itS, right, { why, diag, gl: gloss(glS(s), glA(a), [[it, en]]) }), ...(m === 'ord' ? { t: 'o' } : {}) };
     });
 
   add('a1-05', 'be-no-do', 'Due eccezioni importanti', 'Be non usa do; domande sul soggetto',
@@ -406,6 +408,8 @@
     ['a problem', 'un problema', 1, ['with the car', 'con la macchina']],
     ['five students', 'cinque studenti', 0, ['in the classroom', 'in classe']],
   ];
+  // parole utili: la cosa (senza un / due / del…) e il luogo; there is / are resta da fare
+  const thereGl = (nit, n, plit, pl) => gloss([[nit.replace(/^(una|un|due|tre|cinque|della|delle|dei|degli|del|tanta) /, ''), n.replace(/^(a lot of|an|a|two|three|five|some) /, '')], [plit, pl]]);
   add('a1-06', 'there-is-are', ['There is / there are', 'There is o it is?'], 'There is / there are',
     '"C\'è" è there is (singolare e non numerabili: there\'s a bank, there\'s some milk); "ci sono" è there are (plurale: there are two chairs). Domande: Is there…? Are there…? Il verbo avere non c\'entra: There\'s a park in my town (non My town has / In my town has).',
     () => {
@@ -417,8 +421,8 @@
       if (m === 'choice') return F.choice(`There ___ ${n} ${pl}.`, ['is', 'are'], be, { why });
       if (m === 'fill') return F.fill(`There ___ ${n} ${pl}.`, sing ? ['is'] : ['are'], 'be', { why });
       if (m === 'fix') return sing ? F.fix(`It has ${n} ${pl}.`, acc, { why: '"C\'è" si dice there is, non con have.' }) : F.fix(`There is ${n} ${pl}.`, acc, { why });
-      if (m === 'trq') return F.tr(cap(`${sing ? "c'è" : 'ci sono'} ${nit} ${plit}?`), [`${sing ? 'Is' : 'Are'} there ${n.replace(/^some /, 'any ')} ${pl}?`, `${sing ? 'Is' : 'Are'} there ${n} ${pl}?`], { why: `Domanda: ${sing ? 'Is' : 'Are'} there…?`, diag });
-      return F.tr(cap(`${plit} ${sing ? "c'è" : 'ci sono'} ${nit}.`), acc, { why, diag });
+      if (m === 'trq') return F.tr(cap(`${sing ? "c'è" : 'ci sono'} ${nit} ${plit}?`), [`${sing ? 'Is' : 'Are'} there ${n.replace(/^some /, 'any ')} ${pl}?`, `${sing ? 'Is' : 'Are'} there ${n} ${pl}?`], { why: `Domanda: ${sing ? 'Is' : 'Are'} there…?`, diag, gl: thereGl(nit, n, plit, pl) });
+      return F.tr(cap(`${plit} ${sing ? "c'è" : 'ci sono'} ${nit}.`), acc, { why, diag, gl: thereGl(nit, n, plit, pl) });
     });
 
   const SOME_N = [['eggs', 'uova', 0], ['apples', 'mele', 0], ['biscuits', 'biscotti', 0], ['chairs', 'sedie', 0], ['questions', 'domande', 0], ['milk', 'latte', 1], ['sugar', 'zucchero', 1], ['bread', 'pane', 1], ['water', 'acqua', 1], ['cheese', 'formaggio', 1]];
@@ -435,22 +439,30 @@
       if (m === 'q') return F.choice(`${cap(be)} there ___ ${n} in the kitchen?`, ['some', 'any'], 'any', { why: whyQ });
       if (m === 'fix') return F.fix(`There ${be}n't some ${n}.`, [`There ${be}n't any ${n}.`, `There ${be} no ${n}.`], { why: whyN });
       const art = unc ? itPart(nit, true) : nit;
-      if (m === 'trq') return F.tr(cap(`${unc ? "c'è" : 'ci sono'} ${unc ? art : (fem ? 'delle ' : 'dei ') + nit}?`).replace('dei uova', 'delle uova'), [`${cap(be)} there any ${n}?`], { why: whyQ, diag });
-      return F.tr(cap(`non ${unc ? "c'è" : 'ci sono'} ${unc ? nit : nit}.`), [`There ${be}n't any ${n}.`, `There ${be} no ${n}.`], { why: whyN, diag });
+      if (m === 'trq') return F.tr(cap(`${unc ? "c'è" : 'ci sono'} ${unc ? art : (fem ? 'delle ' : 'dei ') + nit}?`).replace('dei uova', 'delle uova'), [`${cap(be)} there any ${n}?`], { why: whyQ, diag, gl: gloss([[nit, n]]) });
+      return F.tr(cap(`non ${unc ? "c'è" : 'ci sono'} ${unc ? nit : nit}.`), [`There ${be}n't any ${n}.`, `There ${be} no ${n}.`], { why: whyN, diag, gl: gloss([[nit, n]]) });
     });
 
-  const PREP = [['The keys are ___ the table.', 'on', 'Le chiavi sono sul tavolo.', 'On = sopra, a contatto con una superficie.'], ['The cat is ___ the bed.', 'under', 'Il gatto è sotto il letto.', 'Under = sotto.'],
-    ['She is ___ work now.', 'at', 'Adesso è al lavoro.', 'At work, at home, at school: espressioni fisse con at.'], ['I live ___ Rome.', 'in', 'Abito a Roma.', 'Con le città e i paesi: in.'],
-    ['We are ___ home.', 'at', 'Siamo a casa.', 'At home: espressione fissa, senza the.'], ['The milk is ___ the fridge.', 'in', 'Il latte è nel frigo.', 'In = dentro.'],
-    ['The bank is ___ the post office and the bar.', 'between', 'La banca è tra la posta e il bar.', 'Between = tra due cose.'], ['The pharmacy is ___ the bank.', 'next to', 'La farmacia è accanto alla banca.', 'Next to = accanto a (sempre con to).'],
-    ['The bus stop is ___ the school.', 'in front of', 'La fermata è davanti alla scuola.', 'In front of = davanti a.'], ['Meet me ___ the station.', 'at', 'Ci vediamo alla stazione.', 'At + un punto preciso: at the station.'],
-    ['My flat is ___ the second floor.', 'on', 'Il mio appartamento è al secondo piano.', 'I piani: on the second floor.'], ['The picture is ___ the wall.', 'on', 'Il quadro è sulla parete.', 'On = su una superficie, anche verticale.'],
-    ['They live ___ Italy.', 'in', 'Vivono in Italia.', 'Con i paesi: in.'], ['The car is ___ the house.', 'behind', 'La macchina è dietro la casa.', 'Behind = dietro.']];
+  // [frase, preposizione, traduzione, perché, parole utili (mai la preposizione)]
+  const PREP = [['The keys are ___ the table.', 'on', 'Le chiavi sono sul tavolo.', 'On = sopra, a contatto con una superficie.', [['chiavi', 'keys'], ['tavolo', 'table']]],
+    ['The cat is ___ the bed.', 'under', 'Il gatto è sotto il letto.', 'Under = sotto.', [['gatto', 'cat'], ['letto', 'bed']]],
+    ['She is ___ work now.', 'at', 'Lei adesso è al lavoro.', 'At work, at home, at school: espressioni fisse con at.', [['adesso', 'now'], ['lavoro', 'work']]],
+    ['I live ___ Rome.', 'in', 'Abito a Roma.', 'Con le città e i paesi: in.', [['abitare', 'live'], ['Roma', 'Rome']]],
+    ['We are ___ home.', 'at', 'Siamo a casa.', 'At home: espressione fissa, senza the.', [['casa', 'home']]],
+    ['The milk is ___ the fridge.', 'in', 'Il latte è nel frigo.', 'In = dentro.', [['latte', 'milk'], ['frigo', 'fridge']]],
+    ['The bank is ___ the post office and the bar.', 'between', 'La banca è tra la posta e il bar.', 'Between = tra due cose.', [['banca', 'bank'], ['posta', 'post office']]],
+    ['The pharmacy is ___ the bank.', 'next to', 'La farmacia è accanto alla banca.', 'Next to = accanto a (sempre con to).', [['farmacia', 'pharmacy'], ['banca', 'bank']]],
+    ['The bus stop is ___ the school.', 'in front of', 'La fermata è davanti alla scuola.', 'In front of = davanti a.', [['fermata', 'bus stop'], ['scuola', 'school']]],
+    ['Meet me ___ the station.', 'at', 'Ci vediamo alla stazione.', 'At + un punto preciso: at the station.', [['ci vediamo', 'meet me'], ['stazione', 'station']]],
+    ['My flat is ___ the second floor.', 'on', 'Il mio appartamento è al secondo piano.', 'I piani: on the second floor.', [['appartamento', 'flat'], ['secondo piano', 'second floor']]],
+    ['The picture is ___ the wall.', 'on', 'Il quadro è sulla parete.', 'On = su una superficie, anche verticale.', [['quadro', 'picture'], ['parete', 'wall']]],
+    ['They live ___ Italy.', 'in', 'Vivono in Italia.', 'Con i paesi: in.', [['vivere', 'live'], ['Italia', 'Italy']]],
+    ['The car is ___ the house.', 'behind', 'La macchina è dietro la casa.', 'Behind = dietro.', [['macchina', 'car'], ['casa', 'house']]]];
   add('a1-06', 'prepositions', 'Preposizioni di luogo', 'Preposizioni di luogo: in, on, at…',
     'In = dentro e con città e paesi (in the box, in Rome). On = sopra, su una superficie e i piani (on the table, on the second floor). At = un punto preciso ed espressioni fisse (at the station, at home, at work). Next to vuole sempre to.',
     () => {
-      const [q, a, it, why] = pick(PREP);
-      if (coin(0.4)) return F.tr(it, [q.replace('___', a)].concat(a === 'next to' ? [] : []), { why });
+      const [q, a, it, why, words5] = pick(PREP);
+      if (coin(0.4)) return F.tr(it, [q.replace('___', a)], { why, gl: gloss(words5 || []) });
       const opts = uniq([a, ...LEX.shuffle(['in', 'on', 'at', 'under', 'next to', 'between', 'behind', 'in front of']).filter(x => x !== a).slice(0, 2)]);
       return F.choice(q, opts, a, { why });
     });

@@ -726,7 +726,8 @@ function body(ex) {
     return `<p class="prompt">${a}<span class="nowrap"><input class="blank" style="width:${w}ch" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="risposta">${tail}</span>${rest}</p>`;
   }
   if (ex.t === 'd') return `<div class="dict"><button class="play" type="button" id="dplay">${SPK}Ascolta</button><button class="play slow" type="button" id="dslow">Più lento</button></div>${field('Scrivi quello che senti')}`;
-  if (ex.t === 't') return `<p class="prompt">${esc(ex.it)}</p>${field('Scrivi in inglese')}`;
+  // le parole che la lezione non ha spiegato: il vocabolario si dà, la regola no
+  if (ex.t === 't') return `<p class="prompt">${esc(ex.it)}</p>${ex.gl && ex.gl.length ? `<div class="gloss"><span class="lab">Parole utili</span>${ex.gl.map(([i, e]) => `<span class="gw"><i lang="it">${esc(i)}</i> → <b lang="en">${esc(e)}</b></span>`).join('')}</div>` : ''}${field('Scrivi in inglese')}`;
   if (ex.t === 'x') return `<p class="prompt bad">${esc(ex.q)}</p>${field('La frase corretta')}`;
   if (ex.t === 'o') {
     // la maiuscola iniziale svelerebbe la prima parola: la togliamo (tranne I, I'm…)

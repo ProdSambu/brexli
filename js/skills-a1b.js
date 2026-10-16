@@ -1,6 +1,6 @@
 // Regole e generatori della linea A1, fermate 7-12.
 (() => {
-  const { pick, shuffle, cap, uniq, V, SUBJ, SUBJ_TR, is3, enSubj, subjDesc, BE, WAS, beShort, IT, agree, ACT, ACT_TR, T_PRES, T_NOW, T_PAST, itSentence, itPres, itPast, itCont, itFut, enVariants, kindOf, has } = LEX;
+  const { pick, shuffle, cap, uniq, V, SUBJ, SUBJ_TR, is3, enSubj, subjDesc, BE, WAS, beShort, IT, agree, ACT, ACT_TR, T_PRES, T_NOW, T_PAST, itSentence, itPres, itPast, itCont, itFut, enVariants, kindOf, has, glS, glA, glT, gloss } = LEX;
   const { add, F, b, words, lastWord, dPresent, dBaseAfter, spellingHint } = SKILLS;
   const coin = (p = 0.5) => Math.random() < p;
   // domande "Aux + soggetto + verbo + complemento?" con tutte le varianti accettate
@@ -38,7 +38,7 @@
         : F.fix(`${enSubj(s, 1)} ${be} ${is3(s) ? v.third : v.b} ${a.rest} ${t[0]}.`, [`${enSubj(s, 1)} ${be} ${v.ing} ${a.rest} ${t[0]}.`], { why: 'Dopo be serve la forma in -ing.' });
       const ss = pick(SUBJ_TR), aa = pick(NOWABLE_TR), bb = BE[ss.p];
       const acc = enVariants(ss, `${bb} ${aa.v.ing}`, aa, t, { altVerb: vb => `${bb} ${vb.ing}` });
-      const ex = F.tr(itSentence(ss, itCont(aa, ss), aa.itRest, t[1]), acc, { why: `"Sto / stai / sta + gerundio" è il present continuous: ${bb} + ${aa.v.ing}.`, diag: x => dCont(ss, aa.v, words(x).slice(0, 4).join(' ')) });
+      const ex = F.tr(itSentence(ss, itCont(aa, ss), aa.itRest, t[1]), acc, { gl: gloss(glS(ss), glA(aa), glT(t)), why: `"Sto / stai / sta + gerundio" è il present continuous: ${bb} + ${aa.v.ing}.`, diag: x => dCont(ss, aa.v, words(x).slice(0, 4).join(' ')) });
       return m === 'ord' ? { ...ex, t: 'o', d: [is3(ss) ? aa.v.third : aa.v.b] } : ex;
     });
 
@@ -74,6 +74,7 @@
     });
 
   /* =================== A1-08: can e imperativo =================== */
+  const CAN_SAPERE = ['play', 'speak', 'swim', 'cook', 'sing', 'dance', 'fix', 'make'];
   function dCan(s, v, x) {
     const ws = words(x);
     if (ws.includes('cans')) return `${b('can')} è uguale per tutte le persone: niente -s, nemmeno con he, she, it.`;
@@ -101,23 +102,34 @@
         return F.fix(`Does ${ss.en} can ${v.b} ${a.rest}?`, [`Can ${ss.en} ${v.b} ${a.rest}?`], { why: 'Can non usa do: Can + soggetto + verbo base.' });
       }
       const ss = pick(SUBJ_TR), aa = pick(ACT_TR), neg = coin(0.35), q = !neg && coin(0.4);
-      const itV = `${IT.sapere[ss.p]} ${aa.itInf}`;
+      // "so suonare la chitarra" (capacità) ma "posso visitare il museo" (possibilità): in inglese sempre can
+      const itV = `${(CAN_SAPERE.includes(aa.v.b) ? IT.sapere : IT.potere)[ss.p]} ${aa.itInf}`;
       const acc = q ? qVariants('can', ss, vb => vb.b, aa) : enVariants(ss, `${neg ? "can't" : 'can'} ${aa.v.b}`, aa, null, { altVerb: vb => `${neg ? "can't" : 'can'} ${vb.b}` });
-      return F.tr(itSentence(ss, itV, aa.itRest, '', { neg, q }), acc, { why: `"Sapere / potere + infinito" si dice can + verbo base, senza to e senza do.`, diag: x => dCan(ss, aa.v, x) });
+      return F.tr(itSentence(ss, itV, aa.itRest, '', { neg, q }), acc, { gl: gloss(glS(ss), glA(aa)), why: `"Sapere / potere + infinito" si dice can + verbo base, senza to e senza do.`, diag: x => dCan(ss, aa.v, x) });
     });
 
-  const IMP = [['Chiudi la porta, per favore.', ['Close the door, please.', 'Please close the door.', 'Shut the door, please.', 'Please shut the door.']],
-    ['Apri la finestra.', ['Open the window.']], ['Siediti.', ['Sit down.', 'Sit down, please.', 'Please sit down.']], ['Non toccarlo!', ["Don't touch it!"]],
-    ['Non fare tardi!', ["Don't be late!"]], ['Andiamo al cinema!', ["Let's go to the cinema!", "Let's go to the movies!"]], ['Aspettami qui.', ['Wait for me here.', 'Wait here for me.']],
-    ['Non preoccuparti.', ["Don't worry."]], ['Ascolta!', ['Listen!']], ['Non aprire la porta!', ["Don't open the door!"]], ['Mangiamo una pizza!', ["Let's have a pizza!", "Let's eat a pizza!"]],
-    ['Chiamami domani.', ['Call me tomorrow.', 'Phone me tomorrow.']], ['Non parlare così forte!', ["Don't speak so loudly!", "Don't talk so loudly!", "Don't speak so loud!", "Don't talk so loud!"]], ['Sii gentile.', ['Be nice.', 'Be kind.']]];
+  // [frase, traduzioni, parole utili: i verbi all'infinito, mai don't / let's]
+  const IMP = [['Chiudi la porta, per favore.', ['Close the door, please.', 'Please close the door.', 'Shut the door, please.', 'Please shut the door.'], [['chiudere', 'close'], ['porta', 'door'], ['per favore', 'please']]],
+    ['Apri la finestra.', ['Open the window.'], [['aprire', 'open'], ['finestra', 'window']]],
+    ['Siediti, per favore.', ['Sit down, please.', 'Please sit down.', 'Please, sit down.'], [['sedersi', 'sit down'], ['per favore', 'please']]],
+    ['Non toccarlo!', ["Don't touch it!"], [['toccare', 'touch'], ['lo', 'it']]],
+    ['Non fare tardi!', ["Don't be late!"], [['fare tardi', 'be late']]],
+    ['Andiamo al cinema!', ["Let's go to the cinema!", "Let's go to the movies!"], [['andare', 'go']]],
+    ['Aspettami qui.', ['Wait for me here.', 'Wait here for me.'], [['aspettare', 'wait for'], ['qui', 'here']]],
+    ['Non preoccuparti.', ["Don't worry."], [['preoccuparsi', 'worry']]],
+    ['Ascolta questa canzone!', ['Listen to this song!'], [['ascoltare', 'listen to'], ['canzone', 'song']]],
+    ['Non aprire la porta!', ["Don't open the door!"], [['aprire', 'open'], ['porta', 'door']]],
+    ['Mangiamo una pizza!', ["Let's have a pizza!", "Let's eat a pizza!"], [['mangiare', 'eat']]],
+    ['Chiamami domani.', ['Call me tomorrow.', 'Phone me tomorrow.'], [['chiamare', 'call'], ['domani', 'tomorrow']]],
+    ['Non parlare così forte!', ["Don't speak so loudly!", "Don't talk so loudly!", "Don't speak so loud!", "Don't talk so loud!"], [['parlare', 'speak'], ['così forte', 'so loudly']]],
+    ['Sii gentile.', ['Be nice.', 'Be kind.'], [['gentile', 'nice']]]];
   const IMP_FIX = [['Not touch it!', ["Don't touch it!"]], ['No open the door!', ["Don't open the door!"]], ["Don't to worry.", ["Don't worry."]], ['Let us to go!', ["Let's go!", 'Let us go!']], ["Don't are late!", ["Don't be late!"]], ['You close the door!', ['Close the door!']]];
   add('a1-08', 'imperative', "L'imperativo", "L'imperativo",
     "L'imperativo è il verbo base, senza soggetto: Open the window. Negativo: Don't + verbo base (Don't touch it, anche Don't be late). Per proporre qualcosa: Let's + verbo base (Let's go!).",
     () => {
       if (coin(0.35)) { const [w, r] = pick(IMP_FIX); return F.fix(w, r, { why: "Imperativo: verbo base senza soggetto; negativo con don't + verbo base; proposta con let's + verbo base." }); }
-      const [it, acc] = pick(IMP);
-      return F.tr(it, acc, { why: "Imperativo: verbo base, senza soggetto. Negativo: don't + verbo base. Proposta: let's + verbo base.",
+      const [it, acc, impGl] = pick(IMP);
+      return F.tr(it, acc, { gl: gloss(impGl || []), why: "Imperativo: verbo base, senza soggetto. Negativo: don't + verbo base. Proposta: let's + verbo base.",
         diag: x => /^not\b|^no\b/i.test(x.trim()) ? `Il negativo dell'imperativo è ${b("Don't")} + verbo base, non not.` : /^you\b/i.test(x.trim()) ? "L'imperativo non ha soggetto: niente you." : null });
     });
 
@@ -139,7 +151,7 @@
       if (m === 'fix') return F.fix(`${enSubj(s, 1)} ${w === 'was' ? 'were' : 'was'} ${c[0]} ${t[0]}.`, [`${enSubj(s, 1)} ${w} ${c[0]} ${t[0]}.`], { why: wasWhy(s) });
       const ss = pick(SUBJ_TR), ww = WAS[ss.p], q = coin(0.3);
       const acc = q ? [`${cap(ww)} ${ss.en} ${c[0]} ${t[0]}?`, ...(t[2] || []).map(x => `${cap(ww)} ${ss.en} ${c[0]} ${x}?`)] : [`${enSubj(ss, 1)} ${ww} ${c[0]} ${t[0]}.`, `${cap(t[0])} ${ss.en} ${ww} ${c[0]}.`, ...(t[2] || []).map(x => `${enSubj(ss, 1)} ${ww} ${c[0]} ${x}.`)];
-      return F.tr(itSentence(ss, IMPERF[ss.p], itC(c, ss), t[1], { q }), acc, { why: `"Ero / eri / era…" = ${ww}. ${wasWhy(ss)}`, diag: dW(ss, ww) });
+      return F.tr(itSentence(ss, IMPERF[ss.p], itC(c, ss), t[1], { q }), acc, { gl: gloss(glS(ss), [[itC(c, ss), c[0]]], glT(t)), why: `"Ero / eri / era…" = ${ww}. ${wasWhy(ss)}`, diag: dW(ss, ww) });
     });
 
   const CITIES = [['Napoli', 'Naples'], ['Roma', 'Rome'], ['Milano', 'Milan'], ['Torino', 'Turin'], ['Firenze', 'Florence'], ['Venezia', 'Venice'], ['Londra', 'London'], ['Parigi', 'Paris'], ['Bari', 'Bari'], ['Palermo', 'Palermo']];
@@ -151,8 +163,8 @@
       const why = `Nascere = be born, al passato: ${s.en} ${b(w + ' born')}.`;
       const diag = x => /\b(am|is|are)\s+born\b/i.test(x) || /\b(i'm|she's|he's|it's|we're|they're|you're)\s+born\b/i.test(x) ? `In italiano "sono nato" sembra un presente, ma in inglese la nascita è sempre al passato: ${b(w + ' born')}.` : /\bborned\b|\bborn\b/i.test(x) && !/\b(was|were)\b/i.test(x) ? `"Nascere" si dice be born: ${b(w + ' born')}.` : null;
       if (coin(0.3)) return F.fix(`${enSubj(s, 1)} ${BE[s.p]} born ${when[1]}.`, [`${enSubj(s, 1)} ${w} born ${when[1]}.`], { why });
-      if (coin(0.25)) { const ss = pick(SUBJ_TR.filter(x => x.p !== 0)); return F.tr(cap(`dove ${IT.essere[ss.p]} ${agree('nat', ss.g)}${ss.it ? ' ' + ss.it : ''}?`), [`Where ${WAS[ss.p]} ${ss.en} born?`], { why: `Domanda: Where ${WAS[ss.p]} ${ss.en} born?`, diag }); }
-      return F.tr(itSentence(s, itV, when[0]), [`${enSubj(s, 1)} ${w} born ${when[1]}.`], { why, diag });
+      if (coin(0.25)) { const ss = pick(SUBJ_TR.filter(x => x.p !== 0)); return F.tr(cap(`dove ${IT.essere[ss.p]} ${agree('nat', ss.g)}${ss.it ? ' ' + ss.it : ''}?`), [`Where ${WAS[ss.p]} ${ss.en} born?`], { gl: gloss(glS(ss), [['dove', 'where']]), why: `Domanda: Where ${WAS[ss.p]} ${ss.en} born?`, diag }); }
+      return F.tr(itSentence(s, itV, when[0]), [`${enSubj(s, 1)} ${w} born ${when[1]}.`], { why, diag, gl: gloss(glS(s), /^a /.test(when[0]) ? [[when[0].slice(2), when[1].slice(3)]] : []) });
     });
 
   const AGO = [['two days', 'due giorni'], ['three weeks', 'tre settimane'], ['five years', 'cinque anni'], ['a month', 'un mese']];
@@ -166,7 +178,7 @@
       if (m === 'last') return F.choice(`${enSubj(s, 1)} ${w} ${c[0]} ___ night.`, ['last', 'yesterday', 'ago'], 'last', { why: 'Ieri sera = last night (non yesterday night).' });
       if (m === 'choice') return F.choice(`${enSubj(s, 1)} ${w} ${c[0]} ${en} ___.`, ['ago', 'before', 'last'], 'ago', { why });
       if (m === 'fix') return F.fix(`${enSubj(s, 1)} ${w} ${c[0]} before ${en}.`, right, { why });
-      return F.tr(cap(`${en === 'an hour' ? "un'ora" : it} fa ${s.it ? s.it + ' ' : ''}${IMPERF[s.p]} ${c[1]}.`), right, { why, diag: x => /\bbefore\b/i.test(x) ? `"Fa" nel senso di tempo passato non è before: si dice ${b(en + ' ago')}, con ago dopo la durata.` : null });
+      return F.tr(cap(`${en === 'an hour' ? "un'ora" : it} fa ${s.it ? s.it + ' ' : ''}${IMPERF[s.p]} ${c[1]}.`), right, { gl: gloss(glS(s), [[it, en], [c[1], c[0]]]), why, diag: x => /\bbefore\b/i.test(x) ? `"Fa" nel senso di tempo passato non è before: si dice ${b(en + ' ago')}, con ago dopo la durata.` : null });
     });
 
   /* =================== A1-10: past simple =================== */
@@ -190,7 +202,7 @@
       if (coin(0.3)) { const bad = /ied$/.test(v.p1) ? v.b + 'ed' : /([bcdfgklmnprstvz])\1ed$/.test(v.p1) ? v.b + 'ed' : /e$/.test(v.b) ? v.b + 'ed' : v.b + 'd'; return F.fix(`${enSubj(s, 1)} ${bad} ${rest} ${t[0]}.`, [`${enSubj(s, 1)} ${v.p1} ${rest} ${t[0]}.`, `${cap(t[0])} ${s.en} ${v.p1} ${rest}.`], { why }); }
       if (coin(0.35) && a && a.itRest) {
         const ss = pick(SUBJ_TR);
-        return F.tr(itSentence(ss, itPast(a, ss), a.itRest, t[1]), enVariants(ss, v.p1, a, t, { altVerb: x => x.p1 }), { why: `"${itPast(a, ss)}" con un momento finito (${t[1]}) è past simple: ${v.p1}.`, diag: x => dPast(v, words(x).find(y => kindOf(y, v)[0] !== 'other') || x, t[0]) });
+        return F.tr(itSentence(ss, itPast(a, ss), a.itRest, t[1]), enVariants(ss, v.p1, a, t, { altVerb: x => x.p1 }), { gl: gloss(glS(ss), glA(a), glT(t)), why: `"${itPast(a, ss)}" con un momento finito (${t[1]}) è past simple: ${v.p1}.`, diag: x => dPast(v, words(x).find(y => kindOf(y, v)[0] !== 'other') || x, t[0]) });
       }
       return F.fill(`${enSubj(s, 1)} ___ ${rest} ${t[0]}.`, [v.p1], vb, { why, diag: x => dPast(v, x, t[0]) });
     });
@@ -205,7 +217,7 @@
       if (m === 'fix') { const bad = coin() && VERBS.ed(v.b) !== v.p1 ? VERBS.ed(v.b) : (v.pp1 !== v.p1 ? v.pp1 : VERBS.ed(v.b)); return F.fix(`${enSubj(s, 1)} ${bad} ${a.rest} ${t[0]}.`, [`${enSubj(s, 1)} ${v.p1} ${a.rest} ${t[0]}.`, `${cap(t[0])} ${s.en} ${v.p1} ${a.rest}.`], { why }); }
       if (m === 'tr' && a.itRest) {
         const ss = pick(SUBJ_TR);
-        return F.tr(itSentence(ss, itPast(a, ss), a.itRest, t[1]), enVariants(ss, v.p1, a, t, { altVerb: x => x.p1 }), { why: `Il passato prossimo italiano con un momento finito (${t[1]}) è past simple: ${b(v.p1)}.`, diag: x => {
+        return F.tr(itSentence(ss, itPast(a, ss), a.itRest, t[1]), enVariants(ss, v.p1, a, t, { altVerb: x => x.p1 }), { gl: gloss(glS(ss), glA(a), glT(t)), why: `Il passato prossimo italiano con un momento finito (${t[1]}) è past simple: ${b(v.p1)}.`, diag: x => {
           const ws = words(x); if (ws.includes('have') || ws.includes('has')) return `Il passato prossimo italiano ("${itPast(a, ss)}") non si traduce con have: con un momento finito (${t[1]}) si usa il past simple, ${b(v.p1)}.`;
           return dPast(v, ws.find(y => kindOf(y, v)[0] !== 'other') || x, t[0]); } });
       }
@@ -224,7 +236,7 @@
         : F.fix(`Did ${s.en} ${v.p1 !== v.b ? v.p1 : v.third} ${a.rest} ${t[0]}?`, [`Did ${s.en} ${v.b} ${a.rest} ${t[0]}?`], { why });
       const aa = pick(ACT_TR), ss = pick(SUBJ_TR), q = coin();
       const acc = q ? qVariants('did', ss, x => x.b, aa, t) : enVariants(ss, `didn't ${aa.v.b}`, aa, t, { altVerb: x => `didn't ${x.b}` });
-      return F.tr(itSentence(ss, itPast(aa, ss), aa.itRest, t[1], { neg: !q, q }), acc, { why: q ? 'Domanda al passato: Did + soggetto + verbo base.' : "Negativa al passato: didn't + verbo base.", diag: x => {
+      return F.tr(itSentence(ss, itPast(aa, ss), aa.itRest, t[1], { neg: !q, q }), acc, { gl: gloss(glS(ss), glA(aa), glT(t)), why: q ? 'Domanda al passato: Did + soggetto + verbo base.' : "Negativa al passato: didn't + verbo base.", diag: x => {
         const ws = words(x); if (!ws.includes('did') && !/didn't/.test(x)) return `Per ${q ? 'la domanda' : 'la negativa'} al past simple serve ${b(q ? 'Did' : "didn't")} + verbo base.`;
         const i = ws.findIndex(y => y === 'did' || y === "didn't"); const after = ws.slice(i + 1).find(y => kindOf(y, aa.v)[0] !== 'other');
         return after && after !== aa.v.b ? dBaseAfter(q ? 'did' : "didn't", aa.v, after) : null; } });
@@ -243,7 +255,7 @@
         : F.fix(`${enSubj(s, 1)} will ${v.third} ${a.rest} ${t[0]}.`, [`${enSubj(s, 1)} will ${v.b} ${a.rest} ${t[0]}.`], { why: 'Dopo will il verbo resta alla forma base, senza -s.' });
       const aa = pick(ACT_TR), ss = pick(SUBJ_TR), neg = coin(0.3);
       const acc = enVariants(ss, `${neg ? "won't" : 'will'} ${aa.v.b}`, aa, t, { altVerb: x => `${neg ? "won't" : 'will'} ${x.b}` });
-      return F.tr(itSentence(ss, itFut(aa, ss), aa.itRest, t[1], { neg }), acc, { why: `Il futuro italiano (${itFut(aa, ss)}) si rende con ${neg ? "won't" : 'will'} + verbo base.`, diag });
+      return F.tr(itSentence(ss, itFut(aa, ss), aa.itRest, t[1], { neg }), acc, { gl: gloss(glS(ss), glA(aa), glT(t)), why: `Il futuro italiano (${itFut(aa, ss)}) si rende con ${neg ? "won't" : 'will'} + verbo base.`, diag });
     });
 
   add('a1-11', 'going-to', 'Be going to', 'Be going to',
@@ -261,24 +273,25 @@
       }
       const aa = pick(NOWABLE_TR), ss = pick(SUBJ_TR), bb = BE[ss.p];
       const acc = enVariants(ss, `${bb} going to ${aa.v.b}`, aa, t, { altVerb: x => `${bb} going to ${x.b}` });
-      return F.tr(itSentence(ss, `${IT.avere[ss.p]} intenzione di ${aa.itInf}`, aa.itRest, t[1]), acc, { why: `"Avere intenzione di" = be going to + verbo base.`, diag });
+      return F.tr(itSentence(ss, `${IT.avere[ss.p]} intenzione di ${aa.itInf}`, aa.itRest, t[1]), acc, { gl: gloss(glS(ss), glA(aa), glT(t)), why: `"Avere intenzione di" = be going to + verbo base.`, diag });
     });
 
-  const WHEN = [["I'll call you when I ___ home.", 'get', "Ti chiamo quando arrivo a casa.", ["I'll call you when I get home.", "I will call you when I get home."]],
-    ['We will stay at home if it ___.', 'rains', 'Se piove restiamo a casa.', ["If it rains, we'll stay at home.", "If it rains, we will stay at home.", "We'll stay at home if it rains.", 'We will stay at home if it rains.']],
-    ["I'll tell her as soon as I ___ her.", 'see', 'Glielo dirò appena la vedrò.', ["I'll tell her as soon as I see her.", 'I will tell her as soon as I see her.']],
-    ['She will be happy when she ___ the news.', 'hears', 'Sarà contenta quando sentirà la notizia.', ["She'll be happy when she hears the news.", 'She will be happy when she hears the news.']],
-    ["Call me when you ___ at the station.", 'arrive', 'Chiamami quando arrivi in stazione.', ['Call me when you arrive at the station.', 'Call me when you get to the station.']],
-    ["We'll start dinner when Dad ___ home.", 'comes', 'Cominceremo a cenare quando papà tornerà a casa.', ["We'll start dinner when Dad comes home.", 'We will start dinner when Dad comes home.', "We'll start dinner when Dad gets home.", 'We will start dinner when Dad gets home.']]];
+  // [frase, verbo, traduzione, traduzioni accettate, parole utili]
+  const WHEN = [["I'll call you when I ___ home.", 'get', "Ti chiamo quando arrivo a casa.", ["I'll call you when I get home.", "I will call you when I get home."], [['chiamare', 'call'], ['arrivare a casa', 'get home']]],
+    ['We will stay at home if it ___.', 'rains', 'Se piove restiamo a casa.', ["If it rains, we'll stay at home.", "If it rains, we will stay at home.", "We'll stay at home if it rains.", 'We will stay at home if it rains.'], [['piovere', 'rain'], ['restare a casa', 'stay at home']]],
+    ["I'll tell her as soon as I ___ her.", 'see', 'Glielo dirò appena la vedrò.', ["I'll tell her as soon as I see her.", 'I will tell her as soon as I see her.'], [['dirlo a lei', 'tell her'], ['appena', 'as soon as'], ['vedere', 'see']]],
+    ['She will be happy when she ___ the news.', 'hears', 'Sarà contenta quando sentirà la notizia.', ["She'll be happy when she hears the news.", 'She will be happy when she hears the news.'], [['contento', 'happy'], ['sentire', 'hear'], ['la notizia', 'the news']]],
+    ["Call me when you ___ at the station.", 'arrive', 'Chiamami quando arrivi in stazione.', ['Call me when you arrive at the station.', 'Call me when you get to the station.'], [['chiamare', 'call'], ['arrivare in stazione', 'arrive at the station']]],
+    ["We'll start dinner when Dad ___ home.", 'comes', 'Cominceremo a cenare quando papà tornerà a casa.', ["We'll start dinner when Dad comes home.", 'We will start dinner when Dad comes home.', "We'll start dinner when Dad gets home.", 'We will start dinner when Dad gets home.'], [['cominciare a cenare', 'start dinner'], ['papà', 'Dad'], ['tornare a casa', 'come home']]]];
   add('a1-11', 'when-present', 'Dopo when, if, as soon as: presente', 'Dopo when / if: presente, non will',
     'In una frase sul futuro, dopo when, if, as soon as, before, after, until si usa il presente, non will: I\'ll call you when I arrive (ti chiamerò quando arriverò). L\'italiano mette il futuro, l\'inglese no.',
     () => {
-      const [q, a, it, acc] = pick(WHEN), why = `Dopo when / if / as soon as si usa il presente: ${b(a)}, anche se si parla del futuro.`;
+      const [q, a, it, acc, whenGl] = pick(WHEN), why = `Dopo when / if / as soon as si usa il presente: ${b(a)}, anche se si parla del futuro.`;
       const diag = x => /\b(when|if|as soon as)\b[^,]*\bwill\b|\b(when|if|as soon as) \w+ 'll/i.test(x) ? `In italiano dopo "quando / se" si mette il futuro, ma in inglese dopo when / if si usa il presente: ${b(a)}.` : null;
       const m = pick(['choice', 'fix', 'tr']);
       if (m === 'choice') return F.choice(q, [a, `will ${a.replace(/s$/, '').replace(/ie$/, 'y')}`.replace('will hear', 'will hear').replace('will come', 'will come'), a.replace(/s$/, '') === a ? `will ${a}` : `will ${a.replace(/s$/, '')}`], a, { why });
       if (m === 'fix') return F.fix(q.replace('___', `will ${a.replace(/s$/, '')}`), acc, { why });
-      return F.tr(it, acc, { why, diag });
+      return F.tr(it, acc, { why, diag, gl: gloss(whenGl || []) });
     });
 
   const FUT_CHOICE = [["I ___ my dentist at 4 tomorrow. It's in my diary.", 'am seeing', ['will see', 'see'], 'Appuntamento fissato: present continuous.'],
@@ -331,7 +344,7 @@
         const bad = /^more /.test(cmp) ? `${adj}er` : ['good', 'bad'].includes(adj) ? `more ${adj}` : `more ${cmp}`;
         return coin(0.7) ? F.fix(`${A} ${be} ${bad} than ${B}.`, right, { why }) : F.fix(`${A} ${be} ${cmp} of ${B}.`, right, { why: 'Il secondo termine di paragone vuole than.' });
       }
-      return F.tr(`${cap(aIt)} ${piu} ${adjIt} ${bIt}.`, right, { why, diag: x => dCmp(adj, cmp, x) });
+      return F.tr(`${cap(aIt)} ${piu} ${adjIt} ${bIt}.`, right, { why, diag: x => dCmp(adj, cmp, x), gl: gloss([[aIt, A.replace(/^(The|My|This|Your|Today)\b/, m => m.toLowerCase())]], ['good', 'bad'].includes(adj) ? [] : [[adjIt, adj]], [[bIt.replace(/^(della|dello|dell'|dei|del|di) ?/, ''), B]]) });
     });
 
   const SUP = [['restaurant', 'il ristorante', 'expensive', 'most expensive', 'caro', ['in town', 'in the city'], 'della città'], ['building', 'il palazzo', 'tall', 'tallest', 'alto', ['in the world'], 'del mondo'],
@@ -350,7 +363,7 @@
       if (m === 'fill') return F.fill(`It's the ___ ${n} ${pl}.`, [sup], adj, { why, diag: x => dCmp(adj, sup, x) || spellingHint(lastWord(x), sup.split(' ').pop()) });
       if (m === 'fix') return /in the|in town|in Italy/.test(pl) ? F.fix(`It's the ${sup} ${n} ${pl.replace(/^in (the )?/, 'of the ')}.`.replace('of the town', 'of the town'), right, { why: 'Con i luoghi e i gruppi si usa in: the best in the world.' })
         : F.fix(`It's the ${/^most/.test(sup) ? adj + 'est' : 'most ' + adj} ${n} ${pl}.`, right, { why });
-      return F.tr(`È ${nIt} più ${adjIt} ${plIt}.`.replace('È il giorno più felice', 'È il giorno più felice'), right, { why, diag });
+      return F.tr(`È ${nIt} più ${adjIt} ${plIt}.`, right, { why, diag, gl: gloss([[nIt.replace(/^(il|lo|la|l') ?/, ''), n]], adj === 'good' ? [] : [[adjIt, adj]], [[plIt.replace(/^(della|dell'|del|d') ?/, ''), pl.replace(/^(in|of) (the )?/, '')]]) });
     });
 
   const AS = [["Rome isn't as big ___ London.", 'as', ['than', 'like'], 'Uguaglianza: as … as.'], ['My brother is taller ___ me.', 'than', ['of', 'that'], 'Il secondo termine di paragone vuole than.'],

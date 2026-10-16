@@ -140,6 +140,20 @@
     return uniq(out);
   }
 
+  /* ---------- "parole utili" per le traduzioni ----------
+     Il vocabolario che serve, mai la parte su cui verte l'esercizio: il verbo si dà all'infinito
+     (cantare → sing), così -s, passato e -ing restano da fare a chi risponde. */
+  const glS = s => s.it && s.it !== s.en && !['lui', 'lei'].includes(s.it) ? [[s.it.replace(/^il signor /, 'signor '), s.en]] : [];
+  // listen to, wait for: la preposizione va col verbo (ascoltare → listen to · la radio → the radio)
+  const PREP_V = { listen: 'to', wait: 'for' };
+  const glA = a => {
+    if (!a.itInf) return [];
+    const p = PREP_V[a.v.b], rest = p && a.rest.startsWith(p + ' ') ? a.rest.slice(p.length + 1) : a.rest;
+    return [[a.itInf, p ? `${a.v.b} ${p}` : a.v.b], ...(a.itRest ? [[a.itRest, rest]] : [])];
+  };
+  const glT = t => t && t[1] ? [[t[1], t[0]]] : [];
+  const gloss = (...lists) => uniq(lists.flat().filter(p => p && p[0] && p[1] && p[0].toLowerCase() !== p[1].toLowerCase()).map(p => JSON.stringify(p))).map(p => JSON.parse(p));
+
   /* ---------- che forma del verbo ha scritto chi risponde? ---------- */
   function kindOf(word, v) {
     const w = String(word || '').toLowerCase().trim();
@@ -156,5 +170,5 @@
   const has = (kinds, k) => kinds.includes(k);
 
   window.LEX = { pick, shuffle, cap, uniq, V, SUBJ, SUBJ_TR, is3, enSubj, subjDesc, BE, WAS, beShort, IT, agree, ACT, ACT_TR, T_PRES, T_NOW, T_PAST, itFut,
-    itSentence, itPres, itPast, itCont, enVariants, kindOf, has };
+    itSentence, itPres, itPast, itCont, enVariants, kindOf, has, glS, glA, glT, gloss };
 })();

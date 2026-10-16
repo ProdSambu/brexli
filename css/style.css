@@ -231,6 +231,12 @@ p { margin: 0 0 14px; }
 .prompt { font-size: clamp(26px, 4.6vw, 36px); line-height: 1.3; font-weight: 600; margin: 0 0 26px; }
 .prompt.bad { color: var(--no); text-decoration: line-through; text-decoration-thickness: 2px; }
 .prompt .sub { display: block; font-size: 18px; font-weight: 400; color: var(--muted); }
+/* parole utili sotto la frase da tradurre */
+.gloss { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin: -12px 0 24px; font-size: 16px; }
+.gloss .lab { font-size: 13px; font-weight: 600; letter-spacing: .01em; color: var(--muted); margin-right: 2px; }
+.gloss .gw { background: var(--panel); border-radius: 999px; padding: 3px 12px; }
+.gloss .gw i { font-style: normal; color: var(--muted); }
+.gloss .gw b { font-weight: 600; color: var(--ink); }
 .gapline { display: inline-block; width: 3em; border-bottom: 3px solid currentColor; margin: 0 .15em; }
 .blank, .line {
   font: inherit; color: var(--line); background: transparent; border: 0; border-bottom: 3px solid var(--ink);
