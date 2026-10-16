@@ -308,8 +308,28 @@ function grade(ex, user) {
   if (!ex.strict) {
     const { out, words } = fixApos(user);
     if (words.length && matches(out, acc)) return { ok: true, fixed: out, note: `Attenzione all'apostrofo: si scrive <b>${esc([...new Set(words)].join(', '))}</b>.` };
+    // errori di battitura (una lettera, due lettere invertite, uno spazio): la risposta vale, ma lo diciamo
+    const ty = EXPLAIN.typo(user, acc, ex);
+    if (ty) return {
+      ok: true, fixed: ty.fixed, typoHTML: ty.userHTML,
+      note: ty.spaces
+        ? `Attenzione agli spazi: si scrive <b>${esc(ty.fixed)}</b>.`
+        : `Hai fatto ${ty.typos.length > 1 ? "qualche errore" : "un errore"} di battitura: ${ty.typos.map(([u, t]) => `<s>${esc(u)}</s> → <b>${esc(t)}</b>`).join(', ')}.`,
+    };
   }
   return { ok: false };
+}
+// Il riquadro "tu / risposta giusta" con le parole evidenziate e i motivi dell'errore
+function explainHTML(user, acc, compare = true) {
+  const an = EXPLAIN.analyze(user, acc);
+  if (!an) return '';
+  // nella scelta multipla le opzioni sono già evidenziate: bastano i motivi
+  if (!compare) return an.reasons.length ? `<ul class="reasons">${an.reasons.map(r => `<li>${r}</li>`).join('')}</ul>` : '';
+  return `<div class="cmp">
+      <div class="cmprow"><span class="lab">Hai scritto</span><span class="txt">${an.userHTML}</span></div>
+      <div class="cmprow"><span class="lab">Giusta</span><span class="txt">${an.targetHTML} ${sayBtn(an.target)}</span></div>
+    </div>
+    ${an.reasons.length ? `<ul class="reasons">${an.reasons.map(r => `<li>${r}</li>`).join('')}</ul>` : ''}`;
 }
 // Restituisce le frasi accettate complete per un esercizio
 const accepted = ex => ex.t === 'f' ? ex.a.map(x => fillIn(ex.q, x)) : ex.a;
@@ -593,13 +613,14 @@ function session({ items, back, line, onAnswer, onEnd }) {
     }
     function check(choice, giveUp = false) {
       if (checked) return;
-      let ok, sol, yours, note = '';
+      let ok, sol, yours, note = '', explain = '';
       if (ex.t === 'c') {
         if (!giveUp && choice == null) return;
         ok = !giveUp && choice === ex.a;
         $$('.opt').forEach(b => { b.disabled = true; if (b.dataset.v === ex.a) b.classList.add('ok'); else if (b.dataset.v === choice) b.classList.add('no'); });
         sol = ex.q.includes('___') ? esc(ex.q).replace('___', `<b>${esc(ex.a)}</b>`) : `<b>${esc(ex.a)}</b>`;
         yours = choice;
+        if (!ok && !giveUp && ex.q.includes('___')) explain = explainHTML(ex.q.replace('___', choice), [ex.q.replace('___', ex.a)], false);
       } else if (ex.t === 'irr') {
         const [p, pp] = giveUp ? ['', ''] : userAnswer();
         if (!giveUp && !norm(p) && !norm(pp)) { $('#ip').focus(); return; }
@@ -610,7 +631,11 @@ function session({ items, back, line, onAnswer, onEnd }) {
           const ok = forms.split(' / ').map(norm);
           return parts.length > 0 && parts.every(x => ok.includes(x));
         };
-        ok = valid(p, v.p) && valid(pp, v.pp);
+        // una svista di battitura in un campo ("brougth") vale, ma la segnaliamo
+        const typoP = !valid(p, v.p) && EXPLAIN.typoWord(p, v.p), typoPP = !valid(pp, v.pp) && EXPLAIN.typoWord(pp, v.pp);
+        ok = (valid(p, v.p) || !!typoP) && (valid(pp, v.pp) || !!typoPP);
+        if (ok && (typoP || typoPP)) note = `Hai fatto un errore di battitura: ${[[p, typoP], [pp, typoPP]].filter(x => x[1]).map(([u, t]) => `<s>${esc(u.trim())}</s> → <b>${esc(t)}</b>`).join(', ')}.`;
+        if (!ok && !giveUp) { const r = EXPLAIN.irregular(v, p, pp); if (r.length) explain = `<ul class="reasons">${r.map(x => `<li>${x}</li>`).join('')}</ul>`; }
         sol = `<span>${v.b} – <b>${v.p}</b> – <b>${v.pp}</b></span> ${sayBtn(`${v.b}, ${v.p1}, ${v.pp1}`)}`;
         $('#ip').disabled = $('#ipp').disabled = true;
       } else {
@@ -623,6 +648,7 @@ function session({ items, back, line, onAnswer, onEnd }) {
         ok = g.ok; note = g.note || '';
         sol = `<b>${esc(acc[0])}</b> ${sayBtn(acc[0])}`;
         yours = g.fixed || u;
+        if (!ok && !giveUp) explain = explainHTML(u, acc);
         if (inp0) inp0.disabled = true;
       }
       checked = true;
@@ -634,7 +660,9 @@ function session({ items, back, line, onAnswer, onEnd }) {
       fb.innerHTML = `<div class="verdict">${ok ? 'Giusto' : giveUp ? 'Ecco la risposta' : 'Non proprio'}</div>
         ${note ? `<div class="why">${note}</div>` : ''}
         ${ok && ex.t !== 'irr' && ex.t !== 'c' && acc0differs(ex, yours) ? `<div class="sol">Un'altra soluzione: ${sol}</div>` : ''}
-        ${!ok ? `<div class="sol">${!giveUp && yours && ex.t !== 'c' ? `<span class="yours">${esc(yours)}</span>` : ''}${sol}</div>` : ''}
+        ${!ok && explain && ex.t !== 'c' && ex.t !== 'irr' ? explain : ''}
+        ${!ok && !(explain && ex.t !== 'c' && ex.t !== 'irr') ? `<div class="sol">${!giveUp && yours && ex.t !== 'c' && ex.t !== 'irr' ? `<span class="yours">${esc(yours)}</span>` : ''}${sol}</div>` : ''}
+        ${!ok && explain && (ex.t === 'c' || ex.t === 'irr') ? explain : ''}
         ${ex.why ? `<div class="why">${ex.why}</div>` : ''}`;
       go.style.display = '';
       go.textContent = i + 1 < total ? 'Avanti' : 'Vedi il risultato';

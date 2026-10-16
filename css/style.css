@@ -420,3 +420,22 @@ body.noscroll { overflow: hidden; }
   .dpanel details { scroll-margin-top: 150px; }
 }
 @media (prefers-reduced-motion: reduce) { .dpanel, #drawer { transition: none; } }
+
+/* ---------- correzione: confronto parola per parola e motivi ---------- */
+.cmp { margin: 10px 0 4px; display: grid; gap: 8px; }
+.cmprow { display: grid; grid-template-columns: 96px 1fr; gap: 12px; align-items: baseline; }
+.cmprow .lab { font-size: 14px; color: var(--muted); }
+.cmprow .txt { font-size: 21px; line-height: 1.5; }
+.cmprow .txt .say { width: 30px; height: 30px; margin-left: 4px; }
+mark { color: inherit; border-radius: 4px; padding: 0 3px; }
+mark.mw { background: color-mix(in srgb, var(--no) 18%, transparent); text-decoration: underline wavy var(--no); text-decoration-thickness: 1.5px; text-underline-offset: 5px; }
+mark.mr { background: color-mix(in srgb, var(--ok) 20%, transparent); font-weight: 600; }
+.reasons { margin: 12px 0 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.reasons li { position: relative; padding-left: 26px; font-size: 17px; line-height: 1.45; }
+.reasons li::before { content: ""; position: absolute; left: 4px; top: .45em; width: 10px; height: 10px; border-radius: 50%; border: 3px solid var(--no); background: var(--paper); }
+.reasons b { color: var(--ink); }
+.fb .why s { color: var(--no); }
+@media (max-width: 560px) {
+  .cmprow { grid-template-columns: 1fr; gap: 0; }
+  .cmprow .txt { font-size: 19px; }
+}

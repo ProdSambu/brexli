@@ -270,5 +270,5 @@ function tenses(v) {
   ];
 }
 
-window.VERBS = { IRR, REG, ALL, find, tenses, PERSONS: P };
+window.VERBS = { IRR, REG, ALL, find, tenses, PERSONS: P, ed, ing, third };
 })();
